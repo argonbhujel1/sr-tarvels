@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}हाम्रो बारेमा{% else %}About Us{% endif %} — {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="section about-cinematic">
+  <div class="container" style="max-width:900px;">
+    <h1 class="section-title text-center reveal">
+      {% if lang == 'ne' %}हाम्रो बारेमा{% else %}About Us{% endif %}
+    </h1>
+
+    <div class="card about-story" style="padding:2rem; margin-bottom:2.5rem;">
+      <div id="aboutTyping" class="typing-target" data-full="{{ (page.get_content(lang) if page and page.get_content(lang) else (default_about_ne if lang == 'ne' else default_about_en))|e }}"></div>
+      <div id="aboutFull" class="about-full-content" style="display:none; line-height:1.85;">
+        {% if page and page.get_content(lang) %}
+          {{ page.get_content(lang)|safe }}
+        {% else %}
+          {% if lang == 'ne' %}
+            <p><strong>SR All Service Hub Nepal Pvt. Ltd.</strong> ले यात्रा, भिसा, कागजात, टुर र कर्पोरेट सेवाहरू एकै प्लेटफर्ममा प्रदान गर्दछ।</p>
+          {% else %}
+            <p><strong>SR All Service Hub Nepal Pvt. Ltd.</strong> provides travel, visa, documentation, tours and corporate services on one platform.</p>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+
+    {% if team_members %}
+    <h2 class="section-title reveal" style="font-size:1.5rem; margin-bottom:0.5rem;">
+      {% if lang == 'ne' %}हाम्रो पछाडि मानिसहरू{% else %}People Behind Us{% endif %}
+    </h2>
+    <p class="section-subtitle reveal" style="margin-bottom:1.5rem;">
+      {% if lang == 'ne' %}टिम / मालिक — नाम, पद, सम्पर्क{% else %}Team / Owners — name, position, contact{% endif %}
+    </p>
+    <div class="grid-3" style="margin-bottom:3rem;">
+      {% for m in team_members %}
+      <div class="card team-card reveal" style="text-align:center;">
+        {% if m.image_url %}
+        <img src="{{ m.image_url }}" alt="{{ m.name }}" style="width:100%; height:220px; object-fit:cover;">
+        {% else %}
+        <div style="height:120px;background:linear-gradient(135deg,var(--navy),var(--navy-dark));display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:2rem;font-weight:700;">{{ m.name[:1] }}</div>
+        {% endif %}
+        <div class="card-body">
+          <h3 style="font-size:1.15rem;">{{ m.name }}</h3>
+          <p style="color:var(--gold); font-size:0.9rem; margin:0.35rem 0;">{{ m.position_ne if lang == 'ne' else m.position_en }}</p>
+          {% if m.phone %}
+          <p style="font-size:0.95rem;"><a href="tel:{{ m.phone }}">📞 {{ m.phone }}</a></p>
+          {% endif %}
+          {% if m.bio_ne or m.bio_en %}
+          <p style="font-size:0.9rem; color:var(--text-muted); margin-top:0.5rem;">{{ m.bio_ne if lang == 'ne' else m.bio_en }}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if collaborators %}
+    <h2 class="section-title reveal" style="font-size:1.5rem; margin-bottom:0.5rem;">
+      {% if lang == 'ne' %}सहकार्य साझेदार{% else %}Collaboration Partners{% endif %}
+    </h2>
+    <p class="section-subtitle reveal" style="margin-bottom:1.5rem;">
+      {% if lang == 'ne' %}हाम्रा साझेदारहरूको परिचय{% else %}Introduction to our partners{% endif %}
+    </p>
+    <div class="grid-2" style="margin-bottom:2rem;">
+      {% for c in collaborators %}
+      <div class="card collab-card reveal" style="overflow:hidden;">
+        {% set site_logo = setting('logo_url') %}
+        <div class="collab-photo-wrap" style="position:relative; min-height:180px; background:
+          {% if site_logo %}linear-gradient(135deg, rgba(8,29,51,0.75), rgba(16,36,58,0.8)), url('{{ site_logo }}') center/cover{% else %}linear-gradient(145deg, #081D33, #10243A){% endif %};">
+          {% if c.image_url %}
+          <img src="{{ c.image_url }}" alt="{{ c.name }}"
+               class="collab-partner-photo"
+               style="width:100%; height:200px; object-fit:cover; display:block; position:relative; z-index:1;"
+               onerror="this.style.display='none';">
+          {% else %}
+          <div style="height:160px; display:flex; align-items:center; justify-content:center; color:#C9A45C; font-size:2.5rem; font-weight:700;">
+            {{ c.name[:1] }}
+          </div>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          <h3 style="font-size:1.2rem; margin-bottom:0.35rem;">{{ c.name }}</h3>
+          <p style="color:var(--gold); font-size:0.9rem; margin-bottom:0.5rem;">{{ c.position_ne if lang == 'ne' else c.position_en }}</p>
+          {% if c.phone %}<p style="margin-bottom:0.5rem;"><a href="tel:{{ c.phone }}">📞 {{ c.phone }}</a></p>{% endif %}
+          <p class="page-type-body collab-type" style="font-size:0.95rem; color:var(--text-muted); line-height:1.65;">
+            {{ c.bio_ne if lang == 'ne' else c.bio_en }}
+          </p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="text-center reveal">
+      <a href="{{ url_for('public.contact') }}" class="btn btn-primary">
+        {% if lang == 'ne' %}सम्पर्क गर्नुहोस्{% else %}Contact Us{% endif %}
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var el = document.getElementById('aboutTyping');
+  var fullBox = document.getElementById('aboutFull');
+  if (!el || !fullBox) return;
+  var raw = el.getAttribute('data-full') || '';
+  // strip tags for typing preview
+  var tmp = document.createElement('div');
+  tmp.innerHTML = fullBox.innerHTML;
+  var text = (tmp.innerText || tmp.textContent || '').trim();
+  if (!text) { fullBox.style.display = 'block'; return; }
+  el.style.minHeight = '1.5em';
+  el.style.whiteSpace = 'pre-wrap';
+  el.style.lineHeight = '1.85';
+  var i = 0;
+  var speed = 12;
+  function type(){
+    if (i <= text.length) {
+      el.textContent = text.slice(0, i);
+      i += 1;
+      setTimeout(type, speed);
+    } else {
+      el.style.display = 'none';
+      fullBox.style.display = 'block';
+      fullBox.classList.add('fade-in');
+    }
+  }
+  setTimeout(type, 400);
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "admin/layout.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1 style="margin-bottom:1.5rem;">Dashboard</h1>
+<div class="grid-4" style="margin-bottom:2rem;">
+  <div class="stat-card"><div class="value">{{ total_bookings }}</div><div class="label">Total Bookings</div></div>
+  <div class="stat-card"><div class="value">{{ pending }}</div><div class="label">Pending</div></div>
+  <div class="stat-card"><div class="value">{{ confirmed }}</div><div class="label">Confirmed+</div></div>
+  </div>
+<div class="card" style="padding:1.5rem;">
+  <h2 style="font-size:1.2rem; margin-bottom:1rem;">Recent Bookings</h2>
+  <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+    <thead>
+      <tr style="text-align:left; border-bottom:1px solid var(--border);">
+        <th style="padding:0.5rem;">Reference</th>
+        <th>Customer</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in recent %}
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:0.6rem;"><a href="{{ url_for('admin.booking_detail', id=b.id) }}">{{ b.reference }}</a></td>
+        <td>{{ b.customer.full_name }}</td>
+        <td>{{ b.booking_type }}</td>
+        <td><span class="status-badge status-{{ b.status }}">{{ b.status }}</span></td>
+        <td>{{ b.submitted_at.strftime('%Y-%m-%d') }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" style="padding:1rem; color:var(--text-muted);">No bookings yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

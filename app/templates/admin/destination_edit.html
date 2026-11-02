@@ -1,0 +1,27 @@
+{% extends "admin/layout.html" %}
+{% block title %}Destination{% endblock %}
+{% block content %}
+<h1 style="margin-bottom:1.5rem;">{{ 'New Destination' if not destination else 'Edit Destination' }}</h1>
+<form method="post" enctype="multipart/form-data" class="card" style="padding:1.5rem;max-width:700px;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if not destination %}
+  <div class="form-group"><label>Slug *</label><input type="text" name="slug" class="form-control" required placeholder="pokhara"></div>
+  {% endif %}
+  <div class="grid-2">
+    <div class="form-group"><label>Name (Nepali)</label><input type="text" name="name_ne" class="form-control" value="{{ destination.name_ne if destination else '' }}" required></div>
+    <div class="form-group"><label>Name (English)</label><input type="text" name="name_en" class="form-control" value="{{ destination.name_en if destination else '' }}" required></div>
+  </div>
+  <div class="form-group"><label>Country</label><input type="text" name="country" class="form-control" value="{{ destination.country if destination else '' }}"></div>
+  <div class="form-group"><label>Description (Nepali)</label><textarea name="description_ne" class="form-control" rows="3">{{ destination.description_ne if destination else '' }}</textarea></div>
+  <div class="form-group"><label>Description (English)</label><textarea name="description_en" class="form-control" rows="3">{{ destination.description_en if destination else '' }}</textarea></div>
+  <div class="form-group"><label>Image URL</label><input type="text" name="image_url" class="form-control" value="{{ destination.image_url if destination else '' }}"></div>
+  <div class="form-group"><label>Upload Image</label><input type="file" name="image_file" class="form-control" accept="image/*"></div>
+  <div class="form-group">
+    <label style="margin-right:1rem;"><input type="checkbox" name="is_published" {% if not destination or destination.is_published %}checked{% endif %}> Published</label>
+    <label><input type="checkbox" name="is_featured" {% if destination and destination.is_featured %}checked{% endif %}> Featured</label>
+  </div>
+  <div class="form-group"><label>Sort Order</label><input type="number" name="sort_order" class="form-control" value="{{ destination.sort_order if destination else 0 }}" style="max-width:120px;"></div>
+  <button type="submit" class="btn btn-primary">Save</button>
+  <a href="{{ url_for('admin.destinations_admin') }}" class="btn btn-outline">Cancel</a>
+</form>
+{% endblock %}

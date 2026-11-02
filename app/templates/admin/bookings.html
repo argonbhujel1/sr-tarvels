@@ -1,0 +1,56 @@
+{% extends "admin/layout.html" %}
+{% block title %}Bookings{% endblock %}
+{% block content %}
+<h1 style="margin-bottom:1.5rem;">Bookings</h1>
+<div style="margin-bottom:1rem;">
+  <a href="?status=" class="btn btn-navy" style="padding:0.4rem 0.8rem; font-size:0.85rem;">All</a>
+  <a href="?status=Pending" class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.85rem;">Pending</a>
+  <a href="?status=Confirmed" class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.85rem;">Confirmed</a>
+</div>
+<div class="card" style="padding:1rem; overflow-x:auto;">
+  <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+    <thead>
+      <tr style="text-align:left; border-bottom:1px solid var(--border);">
+        <th style="padding:0.5rem;">Reference</th>
+        <th>Customer</th>
+        <th>Mobile</th>
+        <th>Type</th>
+        <th>Package / Service</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in bookings %}
+      {% set d = b.details %}
+      {% set extra = (d.extra_data or {}) if d else {} %}
+      {% set pkg = d.package if d and d.package else none %}
+      {% set pkg_name = (pkg.title_en or pkg.title_ne) if pkg else (extra.get('package_name') or extra.get('package_title_en') or extra.get('package_title_ne') or '') %}
+      {% set svc_name = (b.service.name_en or b.service.name_ne) if b.service else '' %}
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:0.6rem;"><a href="{{ url_for('admin.booking_detail', id=b.id) }}">{{ b.reference }}</a></td>
+        <td>{{ b.customer.full_name if b.customer else '—' }}</td>
+        <td>{{ b.customer.mobile if b.customer else '—' }}</td>
+        <td>{{ b.booking_type }}</td>
+        <td style="max-width:180px;">
+          {% if pkg_name %}<strong>{{ pkg_name }}</strong>{% elif svc_name %}{{ svc_name }}{% else %}—{% endif %}
+        </td>
+        <td><span class="status-badge status-{{ b.status }}">{{ b.status }}</span></td>
+        <td>{{ b.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td style="white-space:nowrap;">
+          <a href="{{ url_for('admin.booking_detail', id=b.id) }}" class="btn btn-navy" style="padding:0.3rem 0.6rem;font-size:0.8rem;">View</a>
+          <form method="post" action="{{ url_for('admin.booking_delete', id=b.id) }}" style="display:inline;"
+                onsubmit="return confirm('Delete booking {{ b.reference }}?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-outline" style="padding:0.3rem 0.6rem;font-size:0.8rem;color:#b91c1c;border-color:#fca5a5;">Del</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" style="padding:1rem;">No bookings.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

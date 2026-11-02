@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}प्रोफाइल{% else %}Profile{% endif %}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:560px;">
+    <h1 class="section-title">{% if lang == 'ne' %}मेरो प्रोफाइल{% else %}My profile{% endif %}</h1>
+    <form method="post" enctype="multipart/form-data" class="card" style="padding:1.75rem;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div style="text-align:center;margin-bottom:1.25rem;">
+        {% if current_user.avatar_url %}
+        <img src="{{ current_user.avatar_url }}" alt="" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid var(--gold);">
+        {% else %}
+        <div style="width:96px;height:96px;border-radius:50%;background:var(--navy);color:var(--gold);display:inline-flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;">{{ current_user.full_name[:1]|upper }}</div>
+        {% endif %}
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}प्रोफाइल फोटो{% else %}Profile photo{% endif %}</label>
+        <input type="file" name="avatar" class="form-control" accept="image/*">
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}पूरा नाम{% else %}Full name{% endif %}</label>
+        <input type="text" name="full_name" class="form-control" value="{{ current_user.full_name }}" required>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" class="form-control" value="{{ current_user.email or '' }}" disabled>
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}मोबाइल{% else %}Mobile{% endif %}</label>
+        <input type="tel" name="mobile" class="form-control" value="{{ current_user.mobile or '' }}">
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}राष्ट्रियता{% else %}Nationality{% endif %}</label>
+        <input type="text" name="nationality" class="form-control" value="{{ current_user.nationality or '' }}">
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}भाषा{% else %}Language{% endif %}</label>
+        <select name="preferred_lang" class="form-control">
+          <option value="ne" {% if current_user.preferred_lang == 'ne' %}selected{% endif %}>नेपाली</option>
+          <option value="en" {% if current_user.preferred_lang == 'en' %}selected{% endif %}>English</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label><input type="checkbox" name="email_notify" {% if current_user.email_notify %}checked{% endif %}>
+          {% if lang == 'ne' %}घोषणा / अपडेट इमेल पाउने{% else %}Receive announcement emails{% endif %}
+        </label>
+      </div>
+      <div class="form-group">
+        <label><input type="checkbox" name="push_enabled" {% if current_user.push_enabled %}checked{% endif %}>
+          {% if lang == 'ne' %}वेब पुश सूचना (ब्राउजर){% else %}Browser push notifications{% endif %}
+        </label>
+      </div>
+      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">
+        {% if lang == 'ne' %}लगइन पछि ब्राउजरले सूचना अनुमति माग्न सक्छ।{% else %}After login, the browser may ask permission for notifications.{% endif %}
+      </p>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}नयाँ पासवर्ड (खाली छोड्न सकिन्छ){% else %}New password (optional){% endif %}</label>
+        <input type="password" name="password" class="form-control" minlength="6" placeholder="••••••">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">{% if lang == 'ne' %}सेभ गर्नुहोस्{% else %}Save profile{% endif %}</button>
+      <a href="{{ url_for('auth.logout') }}" class="btn btn-outline" style="width:100%;margin-top:0.75rem;text-align:center;display:block;">
+        {% if lang == 'ne' %}लगआउट{% else %}Logout{% endif %}
+      </a>
+    </form>
+  </div>
+</section>
+{% endblock %}

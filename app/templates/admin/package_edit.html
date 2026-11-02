@@ -1,0 +1,82 @@
+{% extends "admin/layout.html" %}
+{% block title %}{{ 'New Package' if not package else 'Edit Package' }}{% endblock %}
+{% block content %}
+<h1 style="margin-bottom:1.5rem;">{{ 'New Package' if not package else 'Edit Package' }}</h1>
+<form method="post" enctype="multipart/form-data" class="card" style="padding:1.5rem; max-width:800px;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if not package %}
+  <div class="form-group">
+    <label>Slug (URL) *</label>
+    <input type="text" name="slug" class="form-control" required placeholder="pokhara-3-days">
+  </div>
+  {% endif %}
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Title (Nepali)</label>
+      <input type="text" name="title_ne" class="form-control" value="{{ package.title_ne if package else '' }}" required>
+    </div>
+    <div class="form-group">
+      <label>Title (English)</label>
+      <input type="text" name="title_en" class="form-control" value="{{ package.title_en if package else '' }}" required>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Short Description (Nepali)</label>
+      <textarea name="short_desc_ne" class="form-control" rows="2">{{ package.short_desc_ne if package else '' }}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Short Description (English)</label>
+      <textarea name="short_desc_en" class="form-control" rows="2">{{ package.short_desc_en if package else '' }}</textarea>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Full Description (Nepali)</label>
+    <textarea name="description_ne" class="form-control" rows="4">{{ package.description_ne if package else '' }}</textarea>
+  </div>
+  <div class="form-group">
+    <label>Full Description (English)</label>
+    <textarea name="description_en" class="form-control" rows="4">{{ package.description_en if package else '' }}</textarea>
+  </div>
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Price From</label>
+      <input type="number" step="0.01" name="price_from" class="form-control" value="{{ package.price_from if package else '' }}">
+    </div>
+    <div class="form-group">
+      <label>Minimum payment (advance)</label>
+      <input type="number" step="0.01" name="min_payment" class="form-control" value="{{ package.min_payment if package else '' }}" placeholder="e.g. 5000">
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Currency</label>
+    <input type="text" name="currency" class="form-control" value="{{ package.currency if package else 'NPR' }}" style="max-width:120px;">
+  </div>
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Duration (days)</label>
+      <input type="number" name="duration_days" class="form-control" value="{{ package.duration_days if package else '' }}">
+    </div>
+    <div class="form-group">
+      <label>Sort Order</label>
+      <input type="number" name="sort_order" class="form-control" value="{{ package.sort_order if package else 0 }}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Image URL</label>
+    <input type="text" name="image_url" class="form-control" value="{{ package.image_url if package else '' }}">
+  </div>
+  <div class="form-group">
+    <label>Upload Image</label>
+    <input type="file" name="image_file" class="form-control" accept="image/*">
+  </div>
+  <div class="form-group">
+    <label style="margin-right:1.5rem;"><input type="checkbox" name="is_published" {% if not package or package.is_published %}checked{% endif %}> Published</label>
+    <label><input type="checkbox" name="is_featured" {% if package and package.is_featured %}checked{% endif %}> Featured</label>
+  </div>
+  <div style="display:flex; gap:0.75rem;">
+    <button type="submit" class="btn btn-primary">Save Package</button>
+    <a href="{{ url_for('admin.packages_admin') }}" class="btn btn-outline">Cancel</a>
+  </div>
+</form>
+{% endblock %}

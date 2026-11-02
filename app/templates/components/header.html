@@ -1,0 +1,44 @@
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="{{ url_for('public.home') }}" class="logo">
+      {% set logo = setting('logo_url') %}
+      {% if logo %}
+        <img src="{{ logo }}" alt="{{ app_name }}" style="height:42px; width:auto; object-fit:contain;">
+      {% else %}
+        <span class="logo-mark">SR</span>
+        <span>SR All Service Hub</span>
+      {% endif %}
+    </a>
+    <nav class="nav-main" id="mainNav">
+      <a href="{{ url_for('public.home') }}">{% if lang == 'ne' %}गृह{% else %}Home{% endif %}</a>
+      <a href="{{ url_for('public.about') }}">{% if lang == 'ne' %}हाम्रो बारेमा{% else %}About{% endif %}</a>
+      <a href="{{ url_for('public.services') }}">{% if lang == 'ne' %}सेवाहरू{% else %}Services{% endif %}</a>
+      <a href="{{ url_for('public.packages') }}">{% if lang == 'ne' %}प्याकेज{% else %}Packages{% endif %}</a>
+      <a href="{{ url_for('public.testimonials') }}">{% if lang == 'ne' %}प्रतिक्रिया{% else %}Reviews{% endif %}</a>
+      <a href="{{ url_for('public.contact') }}">{% if lang == 'ne' %}सम्पर्क{% else %}Contact{% endif %}</a>
+      <a href="{{ url_for('booking.track') }}">{% if lang == 'ne' %}ट्र्याक{% else %}Track{% endif %}</a>
+      <a href="{{ url_for('booking.index') }}" class="btn btn-primary" style="padding:0.5rem 1rem;">{% if lang == 'ne' %}बुक गर्नुहोस्{% else %}Book Now{% endif %}</a>
+    </nav>
+    <div class="header-right desktop-only-profile" style="display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;">
+      <div class="header-profile-row desktop-profile-only">
+        {% if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' %}
+          <a href="{{ url_for('auth.profile') }}" class="profile-icon-btn" title="Profile" style="display:inline-flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+            {% if current_user.avatar_url %}
+            <img src="{{ current_user.avatar_url }}" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);">
+            {% else %}
+            <span style="width:32px;height:32px;border-radius:50%;background:var(--navy);color:var(--gold);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;">{{ current_user.full_name[:1]|upper }}</span>
+            {% endif %}
+            <span class="profile-name-desktop" style="font-size:0.8rem;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ current_user.full_name.split()[0] }}</span>
+          </a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}" class="profile-icon-btn" title="Login" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;border:1.5px solid var(--gold);color:var(--gold);text-decoration:none;font-size:0.9rem;">👤</a>
+        {% endif %}
+      </div>
+      <div class="lang-switch">
+        <a href="{{ url_for('public.set_lang', lang='ne', next=request.path) }}" class="{% if lang == 'ne' %}active{% endif %}">नेपाली</a>
+        <a href="{{ url_for('public.set_lang', lang='en', next=request.path) }}" class="{% if lang == 'en' %}active{% endif %}">English</a>
+      </div>
+    </div>
+    <button class="mobile-toggle" id="menuToggle" aria-label="Menu">☰</button>
+  </div>
+</header>

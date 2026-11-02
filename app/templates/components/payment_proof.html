@@ -1,0 +1,72 @@
+{# Requires: require_payment (bool), amount, currency, payment_methods #}
+{% if require_payment %}
+<div class="card" style="padding:1.25rem; margin:1.25rem 0; border:2px solid var(--gold); background:#fffbeb;">
+  <h3 style="font-size:1.05rem; margin-bottom:0.5rem; color:var(--navy);">
+    {% if lang == 'ne' %}भुक्तानी आवश्यक (अग्रिम){% else %}Payment required (advance){% endif %}
+  </h3>
+  <p style="margin-bottom:1rem; font-weight:600;">
+    {% if lang == 'ne' %}रकम{% else %}Amount{% endif %}:
+    <span style="color:var(--gold); font-size:1.2rem;">{{ currency or 'NPR' }} {{ amount }}</span>
+  </p>
+  <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem;">
+    {% if lang == 'ne' %}
+      QR स्क्यान गरी भुक्तानी गर्नुहोस्, त्यसपछि transaction number र स्क्रिनसट अनिवार्य अपलोड गर्नुहोस्।
+    {% else %}
+      Pay via QR, then enter transaction number and upload payment screenshot (required).
+    {% endif %}
+  </p>
+
+  <div class="form-group">
+    <label>{% if lang == 'ne' %}भुक्तानी विधि *{% else %}Payment method *{% endif %}</label>
+    <select name="payment_method_id" id="payMethodSelect" class="form-control" required>
+      <option value="">{% if lang == 'ne' %}— छान्नुहोस् —{% else %}— Select —{% endif %}</option>
+      {% for pm in payment_methods if pm.is_enabled and pm.code != 'cash' %}
+      <option value="{{ pm.id }}"
+              data-qr="{{ pm.qr_image_url or '' }}"
+              data-instr="{{ (pm.instructions_ne if lang == 'ne' else pm.instructions_en) or '' }}">
+        {{ pm.name_ne if lang == 'ne' else pm.name_en }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div id="payQrBox" style="display:none; text-align:center; margin:1rem 0;">
+    <img id="payQrImg" src="" alt="QR" style="max-width:200px; border-radius:8px; background:#fff; padding:8px; border:1px solid var(--border);">
+    <p id="payQrInstr" style="font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem;"></p>
+  </div>
+
+  <div class="form-group">
+    <label>{% if lang == 'ne' %}Transaction Number / ID *{% else %}Transaction Number / ID *{% endif %}</label>
+    <input type="text" name="transaction_id" class="form-control" required
+           placeholder="{% if lang == 'ne' %}eSewa / Khalti / Bank txn ID{% else %}eSewa / Khalti / Bank txn ID{% endif %}">
+  </div>
+
+  <div class="form-group">
+    <label>{% if lang == 'ne' %}भुक्तानी स्क्रिनसट / प्रमाण *{% else %}Payment screenshot / proof *{% endif %}</label>
+    <input type="file" name="payment_proof" class="form-control" accept="image/*,.pdf" required>
+    <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.25rem;">JPG, PNG or PDF</p>
+  </div>
+</div>
+<script>
+(function(){
+  var sel = document.getElementById('payMethodSelect');
+  if (!sel) return;
+  var box = document.getElementById('payQrBox');
+  var img = document.getElementById('payQrImg');
+  var instr = document.getElementById('payQrInstr');
+  sel.addEventListener('change', function(){
+    var opt = sel.options[sel.selectedIndex];
+    var qr = opt.getAttribute('data-qr');
+    var ins = opt.getAttribute('data-instr');
+    if (qr) {
+      img.src = qr;
+      instr.textContent = ins || '';
+      box.style.display = 'block';
+    } else {
+      box.style.display = 'none';
+      if (ins) { instr.textContent = ins; box.style.display = 'block'; img.removeAttribute('src'); }
+    }
+  });
+})();
+</script>
+{% endif %}

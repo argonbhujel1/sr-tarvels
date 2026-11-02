@@ -1,0 +1,41 @@
+{% extends "emails/base_email.html" %}
+{% block content %}
+  <h2 style="margin:0 0 12px;color:#10243A;font-size:22px;">
+    {% if lang == 'ne' %}बुकिङ स्थिति अपडेट{% else %}Booking status update{% endif %}
+  </h2>
+  <p style="margin:0 0 16px;line-height:1.65;color:#333;">
+    {% if lang == 'ne' %}
+    नमस्ते <strong>{{ name }}</strong>,<br>
+    तपाईंको बुकिङको स्थिति परिवर्तन भएको छ। तल विवरण हेर्नुहोस्।
+    {% else %}
+    Hello <strong>{{ name }}</strong>,<br>
+    The status of your booking has been updated. Details are below.
+    {% endif %}
+  </p>
+  <table width="100%" style="border-collapse:collapse;background:#F6F8FA;border-radius:8px;font-size:14px;">
+    <tr>
+      <td style="padding:12px 14px;border-bottom:1px solid #e5e9ef;color:#666;width:140px;">
+        {% if lang == 'ne' %}बुकिङ नम्बर{% else %}Booking number{% endif %}
+      </td>
+      <td style="padding:12px 14px;border-bottom:1px solid #e5e9ef;"><strong>{{ reference }}</strong></td>
+    </tr>
+    <tr>
+      <td style="padding:12px 14px;border-bottom:1px solid #e5e9ef;color:#666;">
+        {% if lang == 'ne' %}नयाँ स्थिति{% else %}New status{% endif %}
+      </td>
+      <td style="padding:12px 14px;border-bottom:1px solid #e5e9ef;"><strong style="color:#C9A45C;">{{ status }}</strong></td>
+    </tr>
+    {% if note %}
+    <tr>
+      <td style="padding:12px 14px;color:#666;vertical-align:top;">{% if lang == 'ne' %}नोट{% else %}Note{% endif %}</td>
+      <td style="padding:12px 14px;white-space:pre-wrap;">{{ note }}</td>
+    </tr>
+    {% endif %}
+  </table>
+  <p style="text-align:center;margin:24px 0 8px;">
+    <a href="{{ track_url }}" style="display:inline-block;background:#10243A;color:#fff;text-decoration:none;font-weight:700;padding:12px 26px;border-radius:8px;">
+      {% if lang == 'ne' %}बुकिङ ट्र्याक गर्नुहोस्{% else %}Track your booking{% endif %}
+    </a>
+  </p>
+  <p style="font-size:12px;color:#888;text-align:center;word-break:break-all;">{{ track_url }}</p>
+{% endblock %}

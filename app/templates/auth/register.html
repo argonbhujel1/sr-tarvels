@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}दर्ता{% else %}Register{% endif %}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:440px;">
+    <h1 class="section-title">{% if lang == 'ne' %}खाता खोल्नुहोस्{% else %}Create account{% endif %}</h1>
+    <form method="post" class="card" style="padding:1.75rem;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}पूरा नाम{% else %}Full name{% endif %}</label>
+        <input type="text" name="full_name" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}मोबाइल{% else %}Mobile{% endif %}</label>
+        <input type="tel" name="mobile" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}पासवर्ड{% else %}Password{% endif %}</label>
+        <input type="password" name="password" class="form-control" minlength="6" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">{% if lang == 'ne' %}दर्ता{% else %}Register{% endif %}</button>
+    </form>
+    <div style="text-align:center;margin:1rem 0;">
+      <a href="{{ url_for('auth.facebook_login') }}" class="btn btn-outline" style="width:100%;margin-bottom:0.5rem;">{% if lang == 'ne' %}Facebook सँग जारी{% else %}Continue with Facebook{% endif %}</a>
+      <a href="{{ url_for('auth.google_login') }}" class="btn btn-outline" style="width:100%;">
+        {% if lang == 'ne' %}Google सँग दर्ता / लगइन{% else %}Continue with Google{% endif %}
+      </a>
+    </div>
+    <p style="text-align:center;font-size:0.9rem;">
+      <a href="{{ url_for('auth.login') }}">{% if lang == 'ne' %}लगइन{% else %}Login{% endif %}</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

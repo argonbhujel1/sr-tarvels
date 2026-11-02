@@ -1,0 +1,63 @@
+{% extends "admin/layout.html" %}
+{% block title %}{{ 'New Member' if not member else 'Edit Member' }}{% endblock %}
+{% block content %}
+<h1 style="margin-bottom:1.5rem;">{{ 'New Team Member' if not member else 'Edit Team Member' }}</h1>
+<form method="post" enctype="multipart/form-data" class="card" style="padding:1.5rem; max-width:700px;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-group">
+    <label>Name *</label>
+    <input type="text" name="name" class="form-control" value="{{ member.name if member else '' }}" required>
+  </div>
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Position (Nepali)</label>
+      <input type="text" name="position_ne" class="form-control" value="{{ member.position_ne if member else '' }}" placeholder="मालिक / सञ्चालक">
+    </div>
+    <div class="form-group">
+      <label>Position (English)</label>
+      <input type="text" name="position_en" class="form-control" value="{{ member.position_en if member else '' }}" placeholder="Owner / Director — or Collaborator: Partner Name">
+    </div>
+  </div>
+  <p style="font-size:0.85rem; color:var(--text-muted); margin-top:-0.5rem; margin-bottom:1rem;">
+    Use the <strong>Collaborator</strong> checkbox below to show this entry under “Collaborated With” on the About page (separate from Team/Owners).
+  </p>
+  <div class="form-group">
+    <label>Phone / Number</label>
+    <input type="text" name="phone" class="form-control" value="{{ member.phone if member else '' }}" placeholder="+977...">
+  </div>
+  <div class="form-group">
+    <label>Intro video URL (YouTube embed or direct) — for collaborators</label>
+    <input type="url" name="video_url" class="form-control" value="{{ member.video_url if member else '' }}" placeholder="https://www.youtube.com/embed/...">
+  </div>
+  <div class="form-group">
+    <label>Bio (Nepali)</label>
+    <textarea name="bio_ne" class="form-control" rows="3">{{ member.bio_ne if member else '' }}</textarea>
+  </div>
+  <div class="form-group">
+    <label>Bio (English)</label>
+    <textarea name="bio_en" class="form-control" rows="3">{{ member.bio_en if member else '' }}</textarea>
+  </div>
+  <div class="form-group">
+    <label>Photo URL</label>
+    <input type="text" name="image_url" class="form-control" value="{{ member.image_url if member else '' }}">
+  </div>
+  <div class="form-group">
+    <label>Upload Photo</label>
+    <input type="file" name="image_file" class="form-control" accept="image/*">
+  </div>
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Sort Order</label>
+      <input type="number" name="sort_order" class="form-control" value="{{ member.sort_order if member else 0 }}">
+    </div>
+    <div class="form-group" style="padding-top:1.5rem;">
+      <label><input type="checkbox" name="is_published" {% if not member or member.is_published %}checked{% endif %}> Published</label>
+      <label style="margin-left:1rem;"><input type="checkbox" name="is_collaborator" {% if member and member.is_collaborator %}checked{% endif %}> Collaborator (shows under Collaborated With)</label>
+    </div>
+  </div>
+  <div style="display:flex; gap:0.75rem;">
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{{ url_for('admin.team_members') }}" class="btn btn-outline">Cancel</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "admin/layout.html" %}
+{% block title %}Edit user{% endblock %}
+{% block content %}
+<h1 style="margin-bottom:1.5rem;">Edit: {{ user.full_name }}</h1>
+<form method="post" class="card" style="padding:1.5rem;max-width:640px;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-group"><label>Full name</label><input type="text" name="full_name" class="form-control" value="{{ user.full_name }}" required></div>
+  <div class="form-group"><label>Email</label><input type="email" name="email" class="form-control" value="{{ user.email or '' }}"></div>
+  <div class="form-group"><label>Mobile</label><input type="text" name="mobile" class="form-control" value="{{ user.mobile or '' }}"></div>
+  <div class="form-group"><label>Nationality</label><input type="text" name="nationality" class="form-control" value="{{ user.nationality or '' }}"></div>
+  <div class="form-group"><label>Notes</label><textarea name="notes" class="form-control" rows="3">{{ user.notes or '' }}</textarea></div>
+  <div class="form-group"><label><input type="checkbox" name="is_active" {% if user.is_active %}checked{% endif %}> Active</label></div>
+  <div class="form-group"><label><input type="checkbox" name="email_notify" {% if user.email_notify %}checked{% endif %}> Email notify</label></div>
+  <div class="form-group"><label><input type="checkbox" name="push_enabled" {% if user.push_enabled %}checked{% endif %}> Push notify</label></div>
+  <button type="submit" class="btn btn-primary">Save</button>
+  <a href="{{ url_for('admin.user_view', id=user.id) }}" class="btn btn-outline">Cancel</a>
+</form>
+{% endblock %}

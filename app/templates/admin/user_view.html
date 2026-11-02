@@ -1,0 +1,49 @@
+{% extends "admin/layout.html" %}
+{% block title %}User · {{ user.full_name }}{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.75rem;">
+  <h1 style="margin:0;">{{ user.full_name }}</h1>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+    <a href="{{ url_for('admin.user_edit', id=user.id) }}" class="btn btn-primary">Edit</a>
+    <a href="{{ url_for('admin.users') }}" class="btn btn-outline">Back</a>
+  </div>
+</div>
+<div class="card" style="padding:1.5rem;max-width:720px;">
+  {% if user.avatar_url %}
+  <img src="{{ user.avatar_url }}" alt="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:1rem;">
+  {% endif %}
+  <p><strong>Email:</strong> {{ user.email or '—' }}</p>
+  <p><strong>Mobile:</strong> {{ user.mobile or '—' }}</p>
+  <p><strong>Nationality:</strong> {{ user.nationality or '—' }}</p>
+  <p><strong>Google:</strong> {% if user.google_id %}Yes{% else %}No{% endif %}
+     · <strong>Facebook:</strong> {% if user.facebook_id %}Yes{% else %}No{% endif %}</p>
+  <p><strong>Email notify:</strong> {{ 'On' if user.email_notify else 'Off' }}
+     · <strong>Push:</strong> {{ 'On' if user.push_enabled else 'Off' }}
+     · <strong>Active:</strong> {{ 'Yes' if user.is_active else 'No' }}</p>
+  <p><strong>Joined:</strong> {{ user.created_at }}</p>
+  <p><strong>Last login:</strong> {{ user.last_login or '—' }}</p>
+  <hr style="margin:1rem 0;">
+  <h3 style="margin-bottom:0.5rem;">Last known location / device</h3>
+  <p><strong>IP:</strong> <code>{{ user.last_ip or '—' }}</code></p>
+  <p><strong>Location:</strong> {{ user.last_location_label or '—' }}</p>
+  <p><strong>Coordinates:</strong>
+    {% if user.last_lat is not none and user.last_lng is not none %}
+      {{ '%.5f'|format(user.last_lat) }}, {{ '%.5f'|format(user.last_lng) }}
+      · <a href="https://www.google.com/maps?q={{ user.last_lat }},{{ user.last_lng }}" target="_blank" rel="noopener">Open map</a>
+    {% else %}—{% endif %}
+  </p>
+  <p style="font-size:0.85rem;color:var(--text-muted);word-break:break-all;"><strong>User-Agent:</strong> {{ user.last_user_agent or '—' }}</p>
+  <p style="font-size:0.85rem;color:var(--text-muted);">Note: Location is approximate from public IP (city/region), not exact GPS street address.</p>
+  <p><strong>Notes:</strong> {{ user.notes or '—' }}</p>
+  <hr style="margin:1rem 0;">
+  <h3 style="margin-bottom:0.5rem;">Bookings</h3>
+  <ul>
+    {% for b in bookings %}
+    <li><a href="{{ url_for('admin.booking_detail', id=b.id) }}">{{ b.reference }}</a> — {{ b.status }}
+      <span style="color:var(--text-muted);font-size:0.85rem;">({{ b.submitted_at }})</span></li>
+    {% else %}
+    <li style="color:var(--text-muted);">No bookings</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

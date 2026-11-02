@@ -1,0 +1,15 @@
+{% extends "admin/layout.html" %}
+{% block title %}Payments{% endblock %}
+{% block content %}
+<h1 style="margin-bottom:1.5rem;">Payments</h1>
+<p style="color:var(--text-muted); margin-bottom:1rem;">Record and verify payments manually. Real gateway integration requires merchant credentials.</p>
+<div class="card" style="padding:1rem;">
+  {% for p in payments %}
+  <div style="padding:0.75rem; border-bottom:1px solid var(--border); font-size:0.9rem;">
+    Booking #{{ p.booking_id }} · NPR {{ p.amount }} · {{ p.status }} · {{ p.transaction_id or '—' }}
+  </div>
+  {% else %}
+  <p style="padding:1rem; color:var(--text-muted);">No payments recorded yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

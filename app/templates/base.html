@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  {% set fav = setting("favicon_url") %}
+  {% if fav %}<link rel="icon" href="{{ fav }}">{% endif %}
+  <meta name="description" content="{% block meta_description %}One Platform. Every Service. Every Journey.{% endblock %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body data-customer="{% if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' %}1{% else %}0{% endif %}" class="has-bottom-nav">
+  {% include "components/header.html" %}
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container" style="padding-top:1rem;">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  {% include "components/footer.html" %}
+  {% include "components/bottom_nav.html" %}
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+
+  <div id="srWritingWait" class="sr-writing-wait" aria-live="polite">
+    <div class="sr-writing-wait-card">
+      <div class="sr-writing-spinner"></div>
+      <p class="sr-writing-wait-title" data-ne="कृपया पर्खनुहोस्" data-en="Please wait">
+        {% if lang == 'ne' %}साइट लोड हुँदै छ{% else %}Loading site{% endif %}
+      </p>
+      <p class="sr-writing-wait-msg" data-ne="प्रारम्भ हुँदै छ…" data-en="Initializing…">
+        {% if lang == 'ne' %}प्रारम्भ हुँदै छ…{% else %}Initializing…{% endif %}
+      </p>
+      <div class="sr-writing-dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+
+<div id="cookieBanner" class="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:rgba(8,29,51,0.97);color:#fff;padding:1rem 1.25rem;box-shadow:0 -4px 24px rgba(0,0,0,0.25);">
+  <div class="container" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;max-width:1100px;margin:0 auto;">
+    <p style="margin:0;font-size:0.9rem;line-height:1.5;flex:1;">
+      {% if lang == 'ne' %}
+      हामी कुकीज प्रयोग गर्छौं साइट सुधार गर्न। जारी राखेर तपाईं सहमति जनाउनुहुन्छ।
+      {% else %}
+      We use cookies to improve your experience. By continuing you accept our use of cookies.
+      {% endif %}
+      <a href="{{ url_for('public.privacy') }}" style="color:#C9A45C;">{% if lang == 'ne' %}गोपनीयता{% else %}Privacy{% endif %}</a>
+    </p>
+    <button type="button" id="cookieAccept" class="btn btn-primary" style="padding:0.5rem 1.25rem;white-space:nowrap;">
+      {% if lang == 'ne' %}स्वीकार गर्नुहोस्{% else %}Accept{% endif %}
+    </button>
+  </div>
+</div>
+<script>
+(function(){
+  var KEY = 'sr_cookie_ok';
+  var bar = document.getElementById('cookieBanner');
+  var btn = document.getElementById('cookieAccept');
+  if (!bar) return;
+  try { if (localStorage.getItem(KEY) === '1') return; } catch(e) {}
+  bar.style.display = 'block';
+  if (btn) btn.addEventListener('click', function(){
+    bar.style.display = 'none';
+    try { localStorage.setItem(KEY, '1'); } catch(e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

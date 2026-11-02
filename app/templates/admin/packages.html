@@ -1,0 +1,41 @@
+{% extends "admin/layout.html" %}
+{% block title %}Packages{% endblock %}
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+  <h1>Tour Packages</h1>
+  <a href="{{ url_for('admin.package_new') }}" class="btn btn-primary">+ New Package</a>
+</div>
+<div class="card" style="padding:0; overflow:hidden;">
+  <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+    <thead>
+      <tr style="text-align:left; background:#f8fafc; border-bottom:1px solid var(--border);">
+        <th style="padding:0.75rem 1rem;">Title (EN)</th>
+        <th>Price</th>
+        <th>Days</th>
+        <th>Published</th>
+        <th style="padding:0.75rem 1rem;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in packages %}
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:0.75rem 1rem;">{{ p.title_en or p.title_ne }}</td>
+        <td>{% if p.price_from %}{{ p.currency }} {{ p.price_from }}{% else %}—{% endif %}</td>
+        <td>{{ p.duration_days or '—' }}</td>
+        <td>{% if p.is_published %}✓{% else %}—{% endif %}</td>
+        <td style="padding:0.75rem 1rem;white-space:nowrap;">
+          <a href="{{ url_for('admin.package_edit', id=p.id) }}" class="btn btn-navy" style="padding:0.35rem 0.75rem; font-size:0.8rem;">Edit</a>
+          <form method="post" action="{{ url_for('admin.package_delete', id=p.id) }}" style="display:inline;"
+                onsubmit="return confirm('Delete package {{ p.title_en or p.title_ne }}? Related bookings keep data but lose package link.');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-outline" style="padding:0.35rem 0.75rem;font-size:0.8rem;color:#b91c1c;border-color:#fca5a5;">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" style="padding:1.5rem;">No packages yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

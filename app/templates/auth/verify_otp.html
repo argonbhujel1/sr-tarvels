@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}OTP प्रमाणीकरण{% else %}Verify OTP{% endif %}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:440px;">
+    <h1 class="section-title">{% if lang == 'ne' %}इमेल OTP{% else %}Email OTP{% endif %}</h1>
+    <p style="text-align:center;color:var(--text-muted);margin-bottom:1.25rem;">
+      {% if lang == 'ne' %}
+      <strong>{{ masked_email }}</strong> मा पठाइएको ६ अंकको कोड हाल्नुहोस्।
+      {% else %}
+      Enter the 6-digit code sent to <strong>{{ masked_email }}</strong>.
+      {% endif %}
+    </p>
+    <form method="post" class="card" style="padding:1.75rem;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label>OTP</label>
+        <input type="text" name="otp" class="form-control" inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
+               placeholder="000000" required autocomplete="one-time-code"
+               style="letter-spacing:0.35em;font-size:1.35rem;text-align:center;">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">
+        {% if lang == 'ne' %}प्रमाणित गरी दर्ता पूरा{% else %}Verify &amp; complete registration{% endif %}
+      </button>
+    </form>
+    <form method="post" style="text-align:center;margin-top:1rem;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="resend">
+      <button type="submit" class="btn btn-outline" style="width:100%;">
+        {% if lang == 'ne' %}OTP फेरि पठाउनुहोस्{% else %}Resend OTP{% endif %}
+      </button>
+    </form>
+    <p style="text-align:center;font-size:0.9rem;margin-top:1rem;">
+      <a href="{{ url_for('auth.register') }}">{% if lang == 'ne' %}फेरि दर्ता{% else %}Start over{% endif %}</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,168 @@
+{% extends "admin/layout.html" %}
+{% block title %}{{ booking.reference }}{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+  <div>
+    <h1 style="margin-bottom:0.35rem;">{{ booking.reference }}</h1>
+    <p style="color:var(--text-muted);margin:0;">
+      {{ booking.booking_type|title }} · {{ booking.submitted_at.strftime('%Y-%m-%d %H:%M') }}
+      · <span class="status-badge status-{{ booking.status }}">{{ booking.status }}</span>
+    </p>
+  </div>
+  <form method="post" action="{{ url_for('admin.booking_delete', id=booking.id) }}"
+        onsubmit="return confirm('Delete this booking permanently?');" style="margin:0;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-outline" style="color:#b91c1c;border-color:#fca5a5;">Delete booking</button>
+  </form>
+</div>
+
+<div class="grid-2">
+  <div class="card" style="padding:1.5rem;">
+    <h2 style="font-size:1.1rem; margin-bottom:1rem;">Customer</h2>
+    {% if booking.customer %}
+    <p><strong>Name:</strong>
+      <a href="{{ url_for('admin.user_view', id=booking.customer.id) }}">{{ booking.customer.full_name }}</a>
+    </p>
+    <p><strong>Mobile:</strong> {{ booking.customer.mobile or '—' }}</p>
+    <p><strong>Email:</strong> {{ booking.customer.email or '—' }}</p>
+    {% else %}
+    <p style="color:var(--text-muted);">No linked customer</p>
+    {% endif %}
+    {% if booking.special_requests %}
+    <p style="margin-top:1rem;"><strong>Requests:</strong><br>{{ booking.special_requests }}</p>
+    {% endif %}
+  </div>
+  <div class="card" style="padding:1.5rem;">
+    <h2 style="font-size:1.1rem; margin-bottom:1rem;">Update Status</h2>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status" class="form-control">
+          {% for s in ['Pending','Under Review','Quotation Sent','Awaiting Payment','Payment Verification','Confirmed','Processing','Completed','Rejected','Cancelled','Refunded'] %}
+          <option value="{{ s }}" {% if booking.status == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Customer-facing note</label>
+        <textarea name="note" class="form-control" rows="3"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+  </div>
+</div>
+
+{# Package / tour details #}
+{% set d = booking.details %}
+{% set extra = (d.extra_data or {}) if d else {} %}
+{% set pkg = d.package if d and d.package else none %}
+{% set pkg_name = (pkg.title_en or pkg.title_ne) if pkg else (extra.get('package_name') or extra.get('package_title_en') or extra.get('package_title_ne')) %}
+{% if pkg_name or d %}
+<div class="card" style="padding:1.5rem; margin-top:1.5rem;">
+  <h2 style="font-size:1.1rem; margin-bottom:1rem;">Booking / Package details</h2>
+  {% if pkg_name %}
+  <p><strong>Package:</strong>
+    {% if pkg %}
+      <a href="{{ url_for('admin.package_edit', id=pkg.id) }}">{{ pkg_name }}</a>
+      {% if pkg.price_from %} · {{ pkg.currency }} {{ pkg.price_from }}{% endif %}
+      {% if pkg.duration_days %} · {{ pkg.duration_days }} days{% endif %}
+    {% else %}
+      {{ pkg_name }}
+    {% endif %}
+  </p>
+  {% endif %}
+  {% if d %}
+  {% if d.number_of_people %}<p><strong>People:</strong> {{ d.number_of_people }}</p>{% endif %}
+  {% if d.planned_travel_date %}<p><strong>Travel date:</strong> {{ d.planned_travel_date }}</p>
+  {% elif extra.get('travel_date') %}<p><strong>Travel date:</strong> {{ extra.get('travel_date') }}</p>{% endif %}
+  {% if d.departure or d.destination %}
+  <p><strong>Route:</strong> {{ d.departure or '—' }} → {{ d.destination or '—' }}</p>
+  {% endif %}
+  {% if d.departure_date %}<p><strong>Departure:</strong> {{ d.departure_date }}{% if d.return_date %} · Return: {{ d.return_date }}{% endif %}</p>{% endif %}
+  {% if d.visa_type %}<p><strong>Visa type:</strong> {{ d.visa_type }}</p>{% endif %}
+  {% if d.passengers %}<p><strong>Passengers:</strong> {{ d.passengers }}</p>{% endif %}
+  {% if d.travel_class %}<p><strong>Class:</strong> {{ d.travel_class }}</p>{% endif %}
+  {% endif %}
+  {% if extra %}
+  <details style="margin-top:0.75rem;">
+    <summary style="cursor:pointer;color:var(--text-muted);">Raw extra data</summary>
+    <pre style="font-size:0.8rem;background:#f8fafc;padding:0.75rem;border-radius:8px;overflow:auto;">{{ extra }}</pre>
+  </details>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if booking.service %}
+<div class="card" style="padding:1.5rem; margin-top:1.5rem;">
+  <h2 style="font-size:1.1rem; margin-bottom:1rem;">Service</h2>
+  <p>{{ booking.service.name_en or booking.service.name_ne }}</p>
+</div>
+{% endif %}
+
+{% if booking.documents %}
+<div class="card" style="padding:1.5rem; margin-top:1.5rem;">
+  <h2 style="font-size:1.1rem; margin-bottom:1rem;">Uploaded Documents</h2>
+  <ul>
+    {% for d in booking.documents %}
+    <li style="margin-bottom:0.5rem;">
+      <a href="{{ d.cloudinary_url }}" target="_blank" rel="noopener">{{ d.original_filename }}</a>
+      <span style="color:var(--text-muted); font-size:0.85rem;"> — {{ d.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if booking.status_logs %}
+<div class="card" style="padding:1.5rem; margin-top:1.5rem;">
+  <h2 style="font-size:1.1rem; margin-bottom:1rem;">Status History</h2>
+  <ul>
+    {% for log in booking.status_logs %}
+    <li style="margin-bottom:0.75rem; font-size:0.9rem;">
+      <strong>{{ log.new_status }}</strong> — {{ log.created_at.strftime('%Y-%m-%d %H:%M') }}
+      {% if log.note %}<br><span style="color:var(--text-muted);">{{ log.note }}</span>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<div class="card" style="padding:1.25rem;margin-top:1.5rem;">
+  <h2 style="font-size:1.1rem;margin-bottom:1rem;">Payment proofs</h2>
+  {% if booking.payments %}
+  <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+    <thead>
+      <tr style="text-align:left;border-bottom:1px solid var(--border);">
+        <th style="padding:0.5rem;">Method</th>
+        <th style="padding:0.5rem;">Amount</th>
+        <th style="padding:0.5rem;">Txn ID</th>
+        <th style="padding:0.5rem;">Status</th>
+        <th style="padding:0.5rem;">Proof</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pay in booking.payments %}
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:0.5rem;">{{ pay.payment_method.name_en if pay.payment_method else '—' }}</td>
+        <td style="padding:0.5rem;">{{ pay.currency }} {{ pay.amount }}</td>
+        <td style="padding:0.5rem;"><code>{{ pay.transaction_id or '—' }}</code></td>
+        <td style="padding:0.5rem;">{{ pay.status }}</td>
+        <td style="padding:0.5rem;">
+          {% if pay.receipt_url %}
+          <a href="{{ pay.receipt_url }}" target="_blank" rel="noopener">
+            {% if pay.receipt_url.lower().endswith('.pdf') %}View PDF{% else %}
+            <img src="{{ pay.receipt_url }}" alt="Proof" style="max-height:80px;border-radius:6px;border:1px solid var(--border);">
+            {% endif %}
+          </a>
+          {% else %}—{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:var(--text-muted);">No payment proof submitted yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
