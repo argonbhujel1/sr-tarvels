@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}लगइन{% else %}Login{% endif %}
+{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:440px;">
+    <h1 class="section-title">{% if lang == 'ne' %}लगइन{% else %}Login{% endif %}</h1>
+    <form method="post" class="card" style="padding:1.75rem;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}पासवर्ड{% else %}Password{% endif %}</label>
+        <input type="password" name="password" class="form-control" required>
+      </div>
+      <p style="text-align:right;margin:0 0 0.75rem;"><a href="{{ url_for('auth.forgot_password') }}" style="font-size:0.85rem;">{% if lang == 'ne' %}पासवर्ड बिर्सनुभयो?{% else %}Forgot password?{% endif %}</a></p>
+      <button type="submit" class="btn btn-primary" style="width:100%;">{% if lang == 'ne' %}लगइन{% else %}Login{% endif %}</button>
+    </form>
+    <div style="text-align:center;margin:1rem 0;">
+      <button type="button" id="biometricLoginBtn" class="btn btn-outline" style="width:100%;margin-bottom:0.5rem;display:none;">
+        {% if lang == 'ne' %}बायोमेट्रिक लगइन{% else %}Login with biometrics{% endif %}
+      </button>
+      <a href="{{ url_for('auth.facebook_login') }}" class="btn btn-outline" style="width:100%;margin-bottom:0.5rem;display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;border-color:#1877F2;color:#1877F2;">
+        {% if lang == 'ne' %}Facebook सँग जारी{% else %}Continue with Facebook{% endif %}
+      </a>
+      <a href="{{ url_for('auth.google_login') }}" class="btn btn-outline" style="width:100%;display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.5-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.3 35.5 26.8 36 24 36c-5.3 0-9.7-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1.1 3.2-3.5 5.7-6.5 7.1l.1.1 6.2 5.2C39.2 37.2 44 31.5 44 24c0-1.3-.1-2.5-.4-3.5z"/></svg>
+        {% if lang == 'ne' %}Google सँग लगइन{% else %}Continue with Google{% endif %}
+      </a>
+    </div>
+    <p style="text-align:center;font-size:0.9rem;">
+      {% if lang == 'ne' %}खाता छैन?{% else %}No account?{% endif %}
+      <a href="{{ url_for('auth.register') }}">{% if lang == 'ne' %}दर्ता गर्नुहोस्{% else %}Register{% endif %}</a>
+    </p>
+  </div>
+</section>
+
+
+<script>
+(function () {
+  function b64urlToBuf(s) {
+    s = String(s || "").replace(/-/g, "+").replace(/_/g, "/");
+    while (s.length % 4) s += "=";
+    var bin = atob(s);
+    var out = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out.buffer;
+  }
+  var btn = document.getElementById("biometricLoginBtn");
+  if (!btn || !window.PublicKeyCredential) return;
+  btn.style.display = "block";
+  btn.addEventListener("click", async function () {
+    btn.disabled = true;
+    try {
+      var challenge = new Uint8Array(32);
+      crypto.getRandomValues(challenge);
+      var saved = null;
+      try { saved = localStorage.getItem("sr_bio_cred"); } catch (e) {}
+      var publicKey = {
+        challenge: challenge.buffer,
+        timeout: 90000,
+        userVerification: "preferred"
+      };
+      if (location.hostname && location.hostname !== "localhost" && !/^\d+\.\d+\.\d+\.\d+$/.test(location.hostname)) {
+        publicKey.rpId = location.hostname;
+      }
+      if (saved) {
+        try {
+          publicKey.allowCredentials = [{ type: "public-key", id: b64urlToBuf(saved) }];
+        } catch (e) {}
+      }
+      var cred = await navigator.credentials.get({ publicKey: publicKey });
+      if (!cred) throw new Error("Cancelled");
+      var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+      var headers = { "Content-Type": "application/json" };
+      if (csrfMeta) headers["X-CSRFToken"] = csrfMeta.content;
+      var formCsrf = document.querySelector('input[name="csrf_token"]');
+      if (formCsrf) headers["X-CSRFToken"] = formCsrf.value;
+      var res = await fetch("{{ url_for('auth.biometric_login') }}", {
+        method: "POST",
+        headers: headers,
+        credentials: "same-origin",
+        body: JSON.stringify({ credentialId: cred.id })
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (data.ok) location.href = data.redirect || "/";
+      else alert(data.error || "Biometric login failed — enable from Profile first.");
+    } catch (e) {
+      console.error(e);
+      alert((e && e.message) ? e.message : "Biometric failed");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+})();
+</script>
+
+{% endblock %}

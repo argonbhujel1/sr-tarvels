@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}भिसा सहायता{% else %}Visa Assistance{% endif %}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:640px;">
+    <h1 class="section-title">{% if lang == 'ne' %}भिसा सहायता अनुरोध{% else %}Visa Assistance Request{% endif %}</h1>
+    <form method="post" class="card" style="padding:2rem;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}गन्तव्य देश{% else %}Destination Country{% endif %}</label>
+        <input type="text" name="destination_country" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}भिसा प्रकार{% else %}Visa Type{% endif %}</label>
+        <select name="visa_type" class="form-control" required>
+          <option value="tourist">{% if lang == 'ne' %}पर्यटक{% else %}Tourist{% endif %}</option>
+          <option value="business">{% if lang == 'ne' %}व्यापार{% else %}Business{% endif %}</option>
+          <option value="student">{% if lang == 'ne' %}विद्यार्थी{% else %}Student{% endif %}</option>
+          <option value="work">{% if lang == 'ne' %}काम{% else %}Work{% endif %}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}यात्रा उद्देश्य{% else %}Travel Purpose{% endif %}</label>
+        <input type="text" name="travel_purpose" class="form-control">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}राष्ट्रियता{% else %}Nationality{% endif %}</label>
+          <input type="text" name="nationality" class="form-control" value="Nepali">
+        </div>
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}यात्रा मिति{% else %}Planned Travel Date{% endif %}</label>
+          <input type="date" name="planned_travel_date" class="form-control">
+        </div>
+      </div>
+      <hr style="margin:1.5rem 0; border:none; border-top:1px solid var(--border);">
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}पूरा नाम{% else %}Full Name{% endif %}</label>
+        <input type="text" name="full_name" class="form-control" required value="{{ current_user.full_name if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' else '' }}">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}मोबाइल{% else %}Mobile{% endif %}</label>
+          <input type="tel" name="mobile" class="form-control" placeholder="+977..." value="{{ current_user.mobile if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" class="form-control" value="{{ current_user.email if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' else '' }}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}विशेष अनुरोध / टिप्पणी{% else %}Special Requests / Notes{% endif %}</label>
+        <textarea name="special_requests" class="form-control"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">
+        {% if lang == 'ne' %}अनुरोध पेश गर्नुहोस्{% else %}Submit Request{% endif %}
+      </button>
+    </form>
+  </div>
+</section>
+{% endblock %}

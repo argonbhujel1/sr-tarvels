@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}टुर बुक{% else %}Book Tour{% endif %}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:640px;">
+    <h1 class="section-title">{% if lang == 'ne' %}टुर प्याकेज बुकिङ{% else %}Tour Package Booking{% endif %}</h1>
+    <form method="post" enctype="multipart/form-data" class="card" style="padding:2rem;" id="tourForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}प्याकेज छान्नुहोस् *{% else %}Select package *{% endif %}</label>
+        <select name="package_id" id="packageSelect" class="form-control" required>
+          <option value="">{% if lang == 'ne' %}— प्याकेज छान्नुहोस् —{% else %}— Choose package —{% endif %}</option>
+          {% for p in packages %}
+          <option value="{{ p.id }}"
+                  data-name-ne="{{ p.title_ne }}"
+                  data-name-en="{{ p.title_en }}"
+                  data-price="{{ p.price_from or '' }}"
+                  data-min="{{ p.min_payment or '' }}"
+                  data-currency="{{ p.currency or 'NPR' }}"
+                  {% if selected_package and selected_package.id == p.id %}selected{% endif %}>
+            {{ p.title_ne if lang == 'ne' else p.title_en }}{% if p.price_from %} — {{ p.currency or 'NPR' }} {{ p.price_from }}{% endif %}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div id="packageInfo" class="card" style="padding:1rem; margin-bottom:1rem; background:#f8fafc; display:none;">
+        <p style="margin:0; font-size:0.95rem;">
+          <strong>{% if lang == 'ne' %}मूल्य{% else %}Price{% endif %}:</strong>
+          <span id="pkgPrice">—</span>
+        </p>
+        <p style="margin:0.35rem 0 0; font-size:0.95rem; color:var(--gold);">
+          <strong>{% if lang == 'ne' %}न्यूनतम / अग्रिम भुक्तानी{% else %}Minimum / advance payment{% endif %}:</strong>
+          <span id="pkgMin">—</span>
+        </p>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}यात्रा मिति{% else %}Travel Date{% endif %}</label>
+          <input type="date" name="travel_date" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}व्यक्ति संख्या{% else %}Number of People{% endif %}</label>
+          <input type="number" name="number_of_people" class="form-control" min="1" value="2" required>
+        </div>
+      </div>
+      <hr style="margin:1.5rem 0; border:none; border-top:1px solid var(--border);">
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}पूरा नाम{% else %}Full Name{% endif %}</label>
+        <input type="text" name="full_name" class="form-control" required value="{{ current_user.full_name if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' else '' }}">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}मोबाइल{% else %}Mobile{% endif %}</label>
+          <input type="tel" name="mobile" class="form-control" placeholder="+977..." value="{{ current_user.mobile if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" class="form-control" value="{{ current_user.email if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' else '' }}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}विशेष आवश्यकता{% else %}Special Requirements{% endif %}</label>
+        <textarea name="special_requests" class="form-control" rows="3"></textarea>
+      </div>
+      {% set require_payment = True %}
+      {% set amount = amount or '—' %}
+      <div id="paySectionDynamic">
+        {% include "components/payment_proof.html" %}
+      </div>
+      <script>
+      (function(){
+        var sel = document.getElementById('packageSelect');
+        var section = document.getElementById('paySectionDynamic');
+        if (!sel || !section) return;
+        function sync(){
+          var opt = sel.options[sel.selectedIndex];
+          var minp = opt && opt.getAttribute('data-min');
+          var price = opt && opt.getAttribute('data-price');
+          var amt = minp || price;
+          var amtEl = section.querySelector('[style*="font-size:1.2rem"]');
+          if (amt) {
+            section.style.display = 'block';
+            section.querySelectorAll('[required]').forEach(function(el){ el.required = true; });
+            if (amtEl) amtEl.textContent = (opt.getAttribute('data-currency')||'NPR') + ' ' + amt;
+          } else {
+            section.style.display = 'none';
+            section.querySelectorAll('[required]').forEach(function(el){ el.required = false; });
+          }
+        }
+        sel.addEventListener('change', sync);
+        sync();
+      })();
+      </script>
+      <button type="submit" class="btn btn-primary" style="width:100%;">
+        {% if lang == 'ne' %}बुकिङ पेश गर्नुहोस्{% else %}Submit Booking{% endif %}
+      </button>
+    </form>
+  </div>
+</section>
+<script>
+(function(){
+  var sel = document.getElementById('packageSelect');
+  var box = document.getElementById('packageInfo');
+  var priceEl = document.getElementById('pkgPrice');
+  var minEl = document.getElementById('pkgMin');
+  function update(){
+    var opt = sel.options[sel.selectedIndex];
+    if (!opt || !opt.value) { box.style.display = 'none'; return; }
+    var cur = opt.getAttribute('data-currency') || 'NPR';
+    var price = opt.getAttribute('data-price');
+    var minp = opt.getAttribute('data-min');
+    priceEl.textContent = price ? (cur + ' ' + price) : '—';
+    minEl.textContent = minp ? (cur + ' ' + minp) : '—';
+    box.style.display = 'block';
+  }
+  sel.addEventListener('change', update);
+  update();
+})();
+</script>
+{% endblock %}

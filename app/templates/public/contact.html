@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}सम्पर्क{% else %}Contact{% endif %} — {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:640px;">
+    <h1 class="section-title text-center">{% if lang == 'ne' %}सम्पर्क गर्नुहोस्{% else %}Contact Us{% endif %}</h1>
+    {% if success %}
+      <div class="alert alert-success">
+        {% if lang == 'ne' %}तपाईंको सन्देश प्राप्त भयो। हामी चाँडै सम्पर्क गर्नेछौं।{% else %}Your message has been received. We will contact you soon.{% endif %}
+      </div>
+    {% endif %}
+    <form method="post" class="card" style="padding:2rem;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}नाम{% else %}Name{% endif %}</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}मोबाइल{% else %}Mobile{% endif %}</label>
+          <input type="tel" name="mobile" class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}विषय{% else %}Subject{% endif %}</label>
+        <input type="text" name="subject" class="form-control">
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}सन्देश{% else %}Message{% endif %}</label>
+        <textarea name="message" class="form-control" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">
+        {% if lang == 'ne' %}पठाउनुहोस्{% else %}Send Message{% endif %}
+      </button>
+    </form>
+    <div class="mt-4 text-center" style="color:var(--text-muted); font-size:0.95rem;">
+      <p>📧 srallservicenepal@gmail.com</p>
+      <p>📞 +977 9713799042 · +977 9851440623</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

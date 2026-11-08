@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}बुकिङ ट्र्याक{% else %}Track Booking{% endif %} — {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:560px;">
+    <h1 class="section-title text-center">{% if lang == 'ne' %}बुकिङ ट्र्याक गर्नुहोस्{% else %}Track Your Booking{% endif %}</h1>
+    <p class="section-subtitle text-center" style="margin-left:auto;margin-right:auto;">
+      {% if lang == 'ne' %}रेफरेन्स नम्बर र दर्ता गरिएको मोबाइल नम्बर प्रविष्ट गर्नुहोस्।{% else %}Enter your booking reference and registered mobile number.{% endif %}
+    </p>
+
+    {% if error %}
+      <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" class="card" style="padding:2rem;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}बुकिङ रेफरेन्स{% else %}Booking Reference{% endif %}</label>
+        <input type="text" name="reference" class="form-control" placeholder="SR-2026-00001" required
+               value="{{ request.form.get('reference') or request.args.get('ref', '') }}">
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}मोबाइल नम्बर{% else %}Mobile Number{% endif %}</label>
+        <input type="tel" name="mobile" class="form-control" placeholder="+977 98XXXXXXXX" required
+               value="{{ request.form.get('mobile') or request.args.get('mobile', '') }}">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">
+        {% if lang == 'ne' %}स्थिति हेर्नुहोस्{% else %}Check Status{% endif %}
+      </button>
+    </form>
+
+    {% if booking %}
+    <div class="card mt-4" style="padding:1.5rem;">
+      <h2 style="font-size:1.25rem; margin-bottom:1rem;">{{ booking.reference }}</h2>
+      <p><strong>{% if lang == 'ne' %}स्थिति{% else %}Status{% endif %}:</strong>
+        <span class="status-badge status-{{ booking.status }}">{{ booking.current_status_label(lang) }}</span>
+      </p>
+      <p style="margin-top:0.75rem;"><strong>{% if lang == 'ne' %}सेवा{% else %}Service{% endif %}:</strong> {{ booking.booking_type|title }}</p>
+      <p><strong>{% if lang == 'ne' %}मिति{% else %}Submitted{% endif %}:</strong> {{ booking.submitted_at.strftime('%Y-%m-%d %H:%M') }}</p>
+      <p><strong>{% if lang == 'ne' %}ग्राहक{% else %}Customer{% endif %}:</strong> {{ booking.customer.full_name }}</p>
+
+      
+      {% if booking.status in ['Quotation Sent', 'Awaiting Payment', 'Payment Verification', 'Pending', 'Under Review'] %}
+      <div class="card mt-4" style="padding:1.5rem;" id="paymentBox">
+        <h3 style="font-size:1.1rem; margin-bottom:1rem;">
+          {% if lang == 'ne' %}भुक्तानी विधि छान्नुहोस्{% else %}Choose Payment Method{% endif %}
+        </h3>
+        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem;">
+          {% if lang == 'ne' %}QR देखिएका विधिहरू मात्र। नगद कार्यालयमा मात्र।{% else %}QR methods shown below. Cash is office-only (not listed here).{% endif %}
+        </p>
+        <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-bottom:1.25rem;">
+          {% for pm in payment_methods if pm.is_enabled and pm.code != 'cash' %}
+          <button type="button" class="btn btn-outline pay-method-btn" data-code="{{ pm.code }}"
+                  data-qr="{{ pm.qr_image_url or '' }}"
+                  data-instr="{{ (pm.get_instructions(lang) or '')|e }}"
+                  data-name="{{ pm.get_name(lang) }}"
+                  style="padding:0.5rem 1rem;">
+            {% if pm.logo_url %}<img src="{{ pm.logo_url }}" alt="" style="height:20px;vertical-align:middle;margin-right:0.35rem;">{% endif %}
+            {{ pm.get_name(lang) }}
+          </button>
+          {% else %}
+          <p style="color:var(--text-muted);">{% if lang == 'ne' %}भुक्तानी विधि उपलब्ध छैन।{% else %}No payment methods available.{% endif %}</p>
+          {% endfor %}
+        </div>
+        <div id="qrDisplay" style="display:none; text-align:center;">
+          <p id="qrMethodName" style="font-weight:600; margin-bottom:0.75rem;"></p>
+          <img id="qrImage" src="" alt="Payment QR" style="max-width:220px; border-radius:8px; background:#fff; padding:8px; border:1px solid var(--border);">
+          <p id="qrInstr" style="font-size:0.9rem; color:var(--text-muted); margin-top:0.75rem;"></p>
+          <p style="font-size:0.85rem; margin-top:0.5rem; color:var(--text-muted);">
+            {% if lang == 'ne' %}भुक्तानी पछि transaction ID वा स्लिप पठाउनुहोस्।{% else %}After payment, send transaction ID or slip to the office.{% endif %}
+          </p>
+        </div>
+        <div id="noQrNote" style="display:none; padding:1rem; background:#f8fafc; border-radius:8px; font-size:0.95rem;"></div>
+      </div>
+      <script>
+      document.querySelectorAll('.pay-method-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('btn-primary'));
+          this.classList.add('btn-primary');
+          var qr = this.getAttribute('data-qr');
+          var name = this.getAttribute('data-name');
+          var instr = this.getAttribute('data-instr');
+          var qrBox = document.getElementById('qrDisplay');
+          var noQr = document.getElementById('noQrNote');
+          if (qr) {
+            document.getElementById('qrImage').src = qr;
+            document.getElementById('qrMethodName').textContent = name;
+            document.getElementById('qrInstr').textContent = instr || '';
+            qrBox.style.display = 'block';
+            noQr.style.display = 'none';
+          } else {
+            qrBox.style.display = 'none';
+            noQr.style.display = 'block';
+            noQr.textContent = name + ': ' + (instr || ({% if lang == 'ne' %}'निर्देशन Admin ले सेट गरेको छैन।'{% else %}'Instructions not set by admin yet.'{% endif %}));
+          }
+        });
+      });
+      </script>
+      {% endif %}
+
+      {% if booking.status_logs %}
+      <h3 style="font-size:1rem; margin:1.5rem 0 0.75rem;">{% if lang == 'ne' %}स्थिति इतिहास{% else %}Status History{% endif %}</h3>
+      <ul style="border-left:2px solid var(--border); padding-left:1rem;">
+        {% for log in booking.status_logs %}
+        <li style="margin-bottom:0.75rem; font-size:0.9rem;">
+          <strong>{{ log.new_status }}</strong>
+          <span style="color:var(--text-muted);"> — {{ log.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+          {% if log.note %}<br><span style="color:var(--text-muted);">{{ log.note }}</span>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

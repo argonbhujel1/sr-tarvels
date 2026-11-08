@@ -1,0 +1,23 @@
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <a href="{{ url_for('public.home') }}" class="bottom-nav-item {% if request.endpoint == 'public.home' %}active{% endif %}">
+    <span class="bn-icon">🏠</span>
+    <span>{% if lang == 'ne' %}गृह{% else %}Home{% endif %}</span>
+  </a>
+  <a href="{{ url_for('public.services') }}" class="bottom-nav-item {% if request.endpoint and 'service' in (request.endpoint or '') %}active{% endif %}">
+    <span class="bn-icon">✦</span>
+    <span>{% if lang == 'ne' %}सेवा{% else %}Services{% endif %}</span>
+  </a>
+  <a href="{{ url_for('booking.index') }}" class="bottom-nav-item bn-center {% if request.endpoint and (request.endpoint or '').startswith('booking') %}active{% endif %}">
+    <span class="bn-icon bn-fab">＋</span>
+    <span>{% if lang == 'ne' %}बुक{% else %}Book{% endif %}</span>
+  </a>
+  <a href="{{ url_for('public.packages') }}" class="bottom-nav-item {% if request.endpoint and 'package' in (request.endpoint or '') %}active{% endif %}">
+    <span class="bn-icon">🗺</span>
+    <span>{% if lang == 'ne' %}प्याकेज{% else %}Packages{% endif %}</span>
+  </a>
+  <a href="{{ url_for('auth.profile') if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' else url_for('auth.login') }}"
+     class="bottom-nav-item {% if request.endpoint and 'profile' in (request.endpoint or '') %}active{% endif %}">
+    <span class="bn-icon">👤</span>
+    <span>{% if lang == 'ne' %}प्रोफाइल{% else %}Profile{% endif %}</span>
+  </a>
+</nav>

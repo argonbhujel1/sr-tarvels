@@ -1,0 +1,22 @@
+{% extends "emails/base_email.html" %}
+{% block content %}
+  <h2 style="margin:0 0 12px;color:#10243A;font-size:22px;">
+    {% if lang == 'ne' %}स्वागत छ, {{ name }}!{% else %}Welcome, {{ name }}!{% endif %}
+  </h2>
+  <p style="margin:0 0 14px;line-height:1.65;color:#333;">
+    {% if lang == 'ne' %}
+    तपाईंको <strong>SR All Service Hub Nepal</strong> खाता तयार भयो
+    {% if via_google %} (Google लगइन मार्फत){% endif %}।
+    अब तपाईं सेवा बुक गर्न, ट्र्याक गर्न र अपडेट प्राप्त गर्न सक्नुहुन्छ।
+    {% else %}
+    Your <strong>SR All Service Hub Nepal</strong> account is ready
+    {% if via_google %} (via Google sign-in){% endif %}.
+    You can now book services, track requests, and receive updates.
+    {% endif %}
+  </p>
+  <p style="text-align:center;margin:22px 0;">
+    <a href="{{ website or '#' }}/booking" style="display:inline-block;background:#C9A45C;color:#081D33;text-decoration:none;font-weight:700;padding:12px 24px;border-radius:8px;">
+      {% if lang == 'ne' %}सेवा बुक गर्नुहोस्{% else %}Book a service{% endif %}
+    </a>
+  </p>
+{% endblock %}

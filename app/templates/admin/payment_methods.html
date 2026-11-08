@@ -1,0 +1,75 @@
+{% extends "admin/layout.html" %}
+{% block title %}Payment Methods{% endblock %}
+{% block content %}
+<h1 style="margin-bottom:0.5rem;">Payment Methods</h1>
+<p style="color:var(--text-muted); margin-bottom:1.5rem;">
+  Enable/disable methods, set instructions, logo and QR images. Logos in footer link to official sites.
+</p>
+
+{% for m in methods %}
+<div class="card" style="padding:1.5rem; margin-bottom:1rem;">
+  <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="id" value="{{ m.id }}">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+      <strong style="font-size:1.1rem;">{{ m.name_en }} ({{ m.code }})</strong>
+      <label style="display:flex; align-items:center; gap:0.4rem;">
+        <input type="checkbox" name="is_enabled" {% if m.is_enabled %}checked{% endif %}> Enabled (show in footer)
+      </label>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Logo URL</label>
+        <input type="text" name="logo_url" class="form-control" value="{{ m.logo_url or '' }}">
+        {% if m.logo_url %}
+        <img src="{{ m.logo_url }}" alt="{{ m.name_en }}" style="max-height:36px; margin-top:0.5rem; background:#fff; padding:4px; border-radius:4px;">
+        {% endif %}
+      </div>
+      <div class="form-group">
+        <label>QR Image URL (for customers)</label>
+        <input type="text" name="qr_image_url" class="form-control" value="{{ m.qr_image_url or '' }}">
+        {% if m.qr_image_url %}
+        <img src="{{ m.qr_image_url }}" alt="QR" style="max-height:80px; margin-top:0.5rem;">
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Clickable payment / account link (your eSewa/Khalti/Bank page or deep link)</label>
+      <input type="url" name="external_url" class="form-control" value="{{ m.external_url or '' }}" placeholder="https://esewa.com.np/... or your payment URL">
+      <p style="font-size:0.8rem;color:var(--text-muted);">Shown as clickable logo in footer. Leave empty for non-clickable.</p>
+    </div>
+    <div class="form-group">
+      <label>Upload new logo</label>
+      <input type="file" name="logo_file" class="form-control" accept="image/*">
+    </div>
+    <div class="form-group">
+      <label>Upload QR image</label>
+      <input type="file" name="qr_file" class="form-control" accept="image/*">
+    </div>
+
+    <div class="form-group">
+      <label>Instructions (Nepali)</label>
+      <textarea name="instructions_ne" class="form-control" rows="2">{{ m.instructions_ne or '' }}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Instructions (English)</label>
+      <textarea name="instructions_en" class="form-control" rows="2">{{ m.instructions_en or '' }}</textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Sort Order</label>
+      <input type="number" name="sort_order" class="form-control" value="{{ m.sort_order or 0 }}" style="max-width:120px;">
+    </div>
+
+    {% if m.external_url %}
+    <p style="font-size:0.85rem; margin-bottom:1rem;">Official site: <a href="{{ m.external_url }}" target="_blank" rel="noopener">{{ m.external_url }}</a></p>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">Save {{ m.name_en }}</button>
+  </form>
+</div>
+{% endfor %}
+{% endblock %}

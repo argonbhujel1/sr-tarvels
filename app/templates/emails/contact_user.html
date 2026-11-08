@@ -1,0 +1,14 @@
+{% extends "emails/base_email.html" %}
+{% block content %}
+  <h2 style="margin:0 0 12px;color:#10243A;font-size:22px;">
+    {% if lang == 'ne' %}सन्देश प्राप्त भयो{% else %}We received your message{% endif %}
+  </h2>
+  <p style="margin:0 0 14px;line-height:1.65;">
+    {% if lang == 'ne' %}
+    नमस्ते <strong>{{ name }}</strong>, तपाईंको सम्पर्क फारमको सन्देश प्राप्त भयो। टिम १–२ कार्य दिन भित्र जवाफ दिनेछ।
+    {% else %}
+    Hello <strong>{{ name }}</strong>, we received your contact form message. Our team will reply within 1–2 business days.
+    {% endif %}
+  </p>
+  {% if subject %}<p style="padding:12px;background:#F6F8FA;border-radius:8px;font-size:14px;"><strong>Subject:</strong> {{ subject }}</p>{% endif %}
+{% endblock %}

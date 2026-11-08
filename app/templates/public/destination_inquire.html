@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}{{ destination.name_en if lang == 'en' else destination.name_ne }} — {% if lang == 'ne' %}सोधपुछ{% else %}Inquiry{% endif %}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:640px;">
+    <h1 class="section-title">{{ destination.name_ne if lang == 'ne' else destination.name_en }}</h1>
+    {% if destination.country %}<p style="color:var(--gold); margin-bottom:0.5rem;">{{ destination.country }}</p>{% endif %}
+    <p style="color:var(--text-muted); margin-bottom:1.5rem;">{{ destination.description_ne if lang == 'ne' else destination.description_en }}</p>
+
+    <form method="post" class="card" style="padding:2rem;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <p style="font-size:0.9rem; margin-bottom:1rem; color:var(--navy); font-weight:600;">
+        {% if lang == 'ne' %}यो गन्तव्यका लागि फारम भरिएको छ — विवरण थप्नुहोस्{% else %}Form pre-filled for this destination — complete your details{% endif %}
+      </p>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}गन्तव्य{% else %}Destination{% endif %}</label>
+        <input type="text" class="form-control" value="{{ destination.name_en if lang == 'en' else destination.name_ne }}" readonly style="background:#f1f5f9;">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}यात्रा मिति{% else %}Travel date{% endif %}</label>
+          <input type="date" name="travel_date" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}व्यक्ति{% else %}People{% endif %}</label>
+          <input type="number" name="people" class="form-control" min="1" value="2">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}पूरा नाम *{% else %}Full name *{% endif %}</label>
+        <input type="text" name="full_name" class="form-control" required>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}मोबाइल *{% else %}Mobile *{% endif %}</label>
+          <input type="tel" name="mobile" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" class="form-control">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}थप विवरण{% else %}More details{% endif %}</label>
+        <textarea name="special_requests" class="form-control" rows="3"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">
+        {% if lang == 'ne' %}सोधपुछ पठाउनुहोस्{% else %}Submit Inquiry{% endif %}
+      </button>
+    </form>
+  </div>
+</section>
+{% endblock %}

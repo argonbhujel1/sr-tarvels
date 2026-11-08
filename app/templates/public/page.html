@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ page.get_title(lang) if page else page_title }} — {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:800px;">
+    <h1 class="section-title page-type-title">{{ page.get_title(lang) if page else page_title }}</h1>
+    <div class="card" style="padding:2rem;">
+      <div class="page-type-body policy-content" id="policyTypeTarget">
+        {% if page %}
+          {{ page.get_content(lang)|safe }}
+        {% else %}
+          <p>{% if lang == 'ne' %}सामग्री चाँडै अद्यावधिक हुनेछ।{% else %}Content will be updated soon.{% endif %}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

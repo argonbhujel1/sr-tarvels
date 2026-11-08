@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}ग्राहक प्रतिक्रिया{% else %}Customer Reviews{% endif %}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="section-title">{% if lang == 'ne' %}ग्राहक प्रतिक्रिया{% else %}Customer Reviews{% endif %}</h1>
+
+    {% if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' %}
+    <div class="card" style="padding:1.5rem;margin-bottom:2rem;max-width:640px;">
+      <h2 style="font-size:1.1rem;margin-bottom:1rem;">{% if lang == 'ne' %}रिव्यू लेख्नुहोस्{% else %}Write a review{% endif %}</h2>
+      <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}रेटिङ{% else %}Rating{% endif %}</label>
+          <select name="rating" class="form-control">
+            <option value="5">★★★★★ 5</option>
+            <option value="4">★★★★ 4</option>
+            <option value="3">★★★ 3</option>
+            <option value="2">★★ 2</option>
+            <option value="1">★ 1</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}तपाईंको अनुभव{% else %}Your experience{% endif %}</label>
+          <textarea name="content" class="form-control" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">{% if lang == 'ne' %}प्रकाशित गर्नुहोस्{% else %}Publish review{% endif %}</button>
+      </form>
+    </div>
+    {% else %}
+    <p style="margin-bottom:1.5rem;">
+      <a href="{{ url_for('auth.login', next=url_for('public.testimonials')) }}" class="btn btn-outline">
+        {% if lang == 'ne' %}रिव्यू दिन लगइन गर्नुहोस्{% else %}Login to write a review{% endif %}
+      </a>
+    </p>
+    {% endif %}
+
+    <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;">
+      {% for r in items %}
+      <div class="card" style="padding:1.25rem;">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+          {% if r.image_url %}
+          <img src="{{ r.image_url }}" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+          {% else %}
+          <span style="width:48px;height:48px;border-radius:50%;background:var(--navy);color:var(--gold);display:inline-flex;align-items:center;justify-content:center;font-weight:700;">{{ r.customer_name[:1]|upper }}</span>
+          {% endif %}
+          <div>
+            <strong>{{ r.customer_name }}</strong>
+            {% if r.mobile %}<div style="font-size:0.85rem;color:var(--text-muted);">{{ r.mobile }}</div>{% endif %}
+            <div style="color:var(--gold);font-size:0.9rem;">{{ '★' * (r.rating or 5) }}</div>
+          </div>
+        </div>
+        <p style="line-height:1.6;margin:0;">{{ r.content_ne if lang == 'ne' else (r.content_en or r.content_ne) }}</p>
+      </div>
+      {% else %}
+      <p style="color:var(--text-muted);">{% if lang == 'ne' %}अहिलेसम्म प्रतिक्रिया छैन।{% else %}No reviews yet.{% endif %}</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

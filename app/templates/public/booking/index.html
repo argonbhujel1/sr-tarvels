@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}बुक गर्नुहोस्{% else %}Book a Service{% endif %}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="section-title text-center">{% if lang == 'ne' %}सेवा बुक गर्नुहोस्{% else %}Book a Service{% endif %}</h1>
+    <p class="section-subtitle text-center" style="margin-left:auto;margin-right:auto;">
+      {% if lang == 'ne' %}आवश्यक सेवा चयन गरी फारम भर्नुहोस्। खाता बनाउनु पर्दैन।{% else %}Select a service and fill the form. No account required.{% endif %}
+    </p>
+    <div class="grid-3">
+      <a href="{{ url_for('booking.flight') }}" class="card service-card">
+        <div class="card-body text-center">
+          <div class="icon" style="margin:0 auto 1rem;">✈</div>
+          <h3>{% if lang == 'ne' %}उडान टिकट{% else %}Flight Tickets{% endif %}</h3>
+        </div>
+      </a>
+      <a href="{{ url_for('booking.visa') }}" class="card service-card">
+        <div class="card-body text-center">
+          <div class="icon" style="margin:0 auto 1rem;">🛂</div>
+          <h3>{% if lang == 'ne' %}भिसा सहायता{% else %}Visa Assistance{% endif %}</h3>
+        </div>
+      </a>
+      <a href="{{ url_for('booking.tour') }}" class="card service-card">
+        <div class="card-body text-center">
+          <div class="icon" style="margin:0 auto 1rem;">🗺</div>
+          <h3>{% if lang == 'ne' %}टुर प्याकेज{% else %}Tour Packages{% endif %}</h3>
+        </div>
+      </a>
+      <a href="{{ url_for('booking.general', service='police-clearance') }}" class="card service-card">
+        <div class="card-body text-center">
+          <div class="icon" style="margin:0 auto 1rem;">📋</div>
+          <h3>{% if lang == 'ne' %}पुलिस क्लियरेन्स{% else %}Police Clearance{% endif %}</h3>
+        </div>
+      </a>
+      <a href="{{ url_for('booking.general', service='shram-swikriti') }}" class="card service-card">
+        <div class="card-body text-center">
+          <div class="icon" style="margin:0 auto 1rem;">📄</div>
+          <h3>{% if lang == 'ne' %}श्रम स्वीकृति{% else %}Shram Swikriti{% endif %}</h3>
+        </div>
+      </a>
+      <a href="{{ url_for('booking.general') }}" class="card service-card">
+        <div class="card-body text-center">
+          <div class="icon" style="margin:0 auto 1rem;">💬</div>
+          <h3>{% if lang == 'ne' %}अन्य सोधपुछ{% else %}Other Inquiry{% endif %}</h3>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

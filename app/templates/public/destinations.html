@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}गन्तव्य{% else %}Destinations{% endif %} — {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="section-title text-center page-type-title">{% if lang == 'ne' %}लोकप्रिय गन्तव्यहरू{% else %}Popular Destinations{% endif %}</h1>
+    {% if destinations %}
+    <div class="grid-3">
+      {% for d in destinations %}
+      <a href="{{ url_for('public.destination_inquire', slug=d.slug) }}" class="card" style="text-decoration:none; color:inherit; display:block;">
+        {% if d.image_url %}<img src="{{ d.image_url }}" alt="" style="width:100%;height:180px;object-fit:cover;">{% endif %}
+        <div class="card-body">
+          <h2 style="font-size:1.15rem;">{{ d.name_ne if lang == 'ne' else d.name_en }}</h2>
+          {% if d.country %}<p style="font-size:0.85rem;color:var(--gold);">{{ d.country }}</p>{% endif %}
+          <p class="page-type-body" style="color:var(--text-muted);font-size:0.95rem;">{{ (d.description_ne if lang == 'ne' else d.description_en) or '' }}</p>
+          <span class="btn btn-navy" style="margin-top:0.75rem; padding:0.4rem 0.9rem; font-size:0.85rem;">
+            {% if lang == 'ne' %}सोधपुछ / बुक{% else %}Inquire / Book{% endif %}
+          </span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center" style="color:var(--text-muted);">{% if lang == 'ne' %}Admin बाट गन्तव्य थप्नुहोस्।{% else %}Add destinations from Admin.{% endif %}</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,178 @@
+{% extends "admin/layout.html" %}
+{% block title %}Site Settings{% endblock %}
+{% block content %}
+<h1 style="margin-bottom:0.5rem;">Site Settings & Branding</h1>
+<p style="color:var(--text-muted); margin-bottom:1.5rem;">Logo, favicon, company info and BAM Studio credit settings.</p>
+
+<form method="post" enctype="multipart/form-data" class="card" style="padding:1.5rem; max-width:900px;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <h2 style="font-size:1.1rem; margin-bottom:1rem; color:var(--navy);">Branding / Logos</h2>
+
+  {% set s = settings.get('logo_url') %}
+  <div class="form-group">
+    <label>Company Logo URL</label>
+    <input type="text" name="logo_url" class="form-control" value="{{ s.value_ne if s else '' }}" placeholder="https://... or /static/uploads/branding/logo.png">
+    <p style="font-size:0.8rem; color:var(--text-muted);">Or upload below</p>
+    <input type="file" name="logo_file" class="form-control" accept="image/*" style="margin-top:0.5rem;">
+    {% if s and s.value_ne %}
+    <img src="{{ s.value_ne }}" alt="Logo" style="max-height:48px; margin-top:0.5rem; background:#eee; padding:4px;">
+    {% endif %}
+  </div>
+
+  {% set s = settings.get('favicon_url') %}
+  <div class="form-group">
+    <label>Favicon URL</label>
+    <input type="text" name="favicon_url" class="form-control" value="{{ s.value_ne if s else '' }}" placeholder="/static/uploads/branding/favicon.ico">
+    <input type="file" name="favicon_file" class="form-control" accept=".ico,.png,.svg" style="margin-top:0.5rem;">
+  </div>
+
+  {% set s = settings.get('bam_logo_url') %}
+  <div class="form-group">
+    <label>BAM Studio Logo URL (footer technology partner)</label>
+    <input type="text" name="bam_logo_url" class="form-control" value="{{ s.value_ne if s else '' }}">
+    <input type="file" name="bam_logo_file" class="form-control" accept="image/*" style="margin-top:0.5rem;">
+    <p style="font-size:0.8rem; color:var(--text-muted);">Shown next to "Technology Partner: BAM Studio" in footer. Permanent credit remains.</p>
+  </div>
+
+  <hr style="margin:1.5rem 0; border:none; border-top:1px solid var(--border);">
+  <h2 style="font-size:1.1rem; margin-bottom:1rem; color:var(--navy);">Company Info</h2>
+
+  {% set s = settings.get('company_name') %}
+  <div class="form-group">
+    <label>Company Name</label>
+    <input type="text" name="company_name" class="form-control" value="{{ s.value_ne if s else '' }}">
+  </div>
+
+  {% set s = settings.get('tagline') %}
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Tagline (Nepali)</label>
+      <input type="text" name="tagline_ne" class="form-control" value="{{ s.value_ne if s else '' }}">
+    </div>
+    <div class="form-group">
+      <label>Tagline (English)</label>
+      <input type="text" name="tagline_en" class="form-control" value="{{ s.value_en if s else '' }}">
+    </div>
+  </div>
+
+  {% set s = settings.get('email') %}
+  <div class="form-group">
+    <label>Email</label>
+    <input type="email" name="email" class="form-control" value="{{ s.value_ne if s else '' }}">
+  </div>
+
+  <h3 style="margin:1.5rem 0 0.75rem;color:var(--navy);">Social Media Links (footer icons)</h3>
+  {% set s = settings.get('facebook') %}
+  <div class="form-group">
+    <label>Facebook URL</label>
+    <input type="url" name="facebook" class="form-control" value="{{ s.value_ne if s else '' }}">
+  </div>
+  {% set s = settings.get('instagram') %}
+  <div class="form-group">
+    <label>Instagram URL</label>
+    <input type="url" name="instagram" class="form-control" value="{{ s.value_ne if s else '' }}">
+  </div>
+  {% set s = settings.get('tiktok') %}
+  <div class="form-group">
+    <label>TikTok URL</label>
+    <input type="url" name="tiktok" class="form-control" value="{{ s.value_ne if s else '' }}">
+  </div>
+  {% set s = settings.get('youtube') %}
+  <div class="form-group">
+    <label>YouTube URL</label>
+    <input type="url" name="youtube" class="form-control" value="{{ s.value_ne if s else '' }}">
+  </div>
+  {% set s = settings.get('linkedin') %}
+  <div class="form-group">
+    <label>LinkedIn URL</label>
+    <input type="url" name="linkedin" class="form-control" value="{{ s.value_ne if s else '' }}">
+  </div>
+  {% set s = settings.get('twitter') %}
+  <div class="form-group">
+    <label>X / Twitter URL</label>
+    <input type="url" name="twitter" class="form-control" value="{{ s.value_ne if s else '' }}">
+  </div>
+
+  {% set s = settings.get('hours') %}
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Hours (Nepali)</label>
+      <input type="text" name="hours_ne" class="form-control" value="{{ s.value_ne if s else '' }}">
+    </div>
+    <div class="form-group">
+      <label>Hours (English)</label>
+      <input type="text" name="hours_en" class="form-control" value="{{ s.value_en if s else '' }}">
+    </div>
+  </div>
+
+  {% set s = settings.get('footer_intro_ne') %}
+  <div class="form-group">
+    <label>Footer Intro (Nepali)</label>
+    <textarea name="footer_intro_ne" class="form-control" rows="3">{{ s.value_ne if s else '' }}</textarea>
+  </div>
+  {% set s = settings.get('footer_intro_en') %}
+  <div class="form-group">
+    <label>Footer Intro (English)</label>
+    <textarea name="footer_intro_en" class="form-control" rows="3">{{ s.value_en if s else '' }}</textarea>
+  </div>
+
+  
+  <hr style="margin:1.5rem 0; border:none; border-top:1px solid var(--border);">
+  <h2 style="font-size:1.1rem; margin-bottom:1rem; color:var(--navy);">Homepage Hero Background</h2>
+  {% set s = settings.get('hero_bg_url') %}
+  <div class="form-group">
+    <label>Hero background image URL</label>
+    <input type="text" name="hero_bg_url" class="form-control" value="{{ s.value_ne if s else '' }}" placeholder="https://... or /static/uploads/branding/hero.jpg">
+    <input type="file" name="hero_bg_file" class="form-control" accept="image/*" style="margin-top:0.5rem;">
+    <p style="font-size:0.8rem; color:var(--text-muted);">Or set image on Homepage → hero section.</p>
+  </div>
+
+  <hr style="margin:1.5rem 0; border:none; border-top:1px solid var(--border);">
+  <h2 style="font-size:1.1rem; margin-bottom:0.5rem; color:var(--navy);">Homepage Popup Notice</h2>
+  <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Shows only on Home, once per browser session (first load / refresh). Uses site logo + contact automatically.</p>
+  {% set s = settings.get('popup_enabled') %}
+  <div class="form-group">
+    <label><input type="checkbox" name="popup_enabled" {% if s and s.value_ne in ['1','true','yes','on'] %}checked{% endif %}> Enable popup on homepage</label>
+  </div>
+  {% set s = settings.get('popup_title_ne') %}
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Popup title (Nepali)</label>
+      <input type="text" name="popup_title_ne" class="form-control" value="{{ s.value_ne if s else '' }}">
+    </div>
+    {% set s = settings.get('popup_title_en') %}
+    <div class="form-group">
+      <label>Popup title (English)</label>
+      <input type="text" name="popup_title_en" class="form-control" value="{{ s.value_ne if s else '' }}">
+    </div>
+  </div>
+  {% set s = settings.get('popup_body_ne') %}
+  <div class="form-group">
+    <label>Popup message (Nepali)</label>
+    <textarea name="popup_body_ne" class="form-control" rows="3">{{ s.value_ne if s else '' }}</textarea>
+  </div>
+  {% set s = settings.get('popup_body_en') %}
+  <div class="form-group">
+    <label>Popup message (English)</label>
+    <textarea name="popup_body_en" class="form-control" rows="3">{{ s.value_ne if s else '' }}</textarea>
+  </div>
+
+
+<hr style="margin:2rem 0;">
+<h3 style="margin-bottom:0.75rem;">Footer map embed</h3>
+<p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:0.75rem;">Paste Google Maps iframe HTML. Shown under payment methods in the footer.</p>
+{% set s = settings.get('map_embed_html') %}
+<div class="form-group">
+  <label>Map embed HTML</label>
+  <textarea name="map_embed_html" class="form-control" rows="4" placeholder='&lt;iframe src="https://www.google.com/maps/embed?..."&gt;&lt;/iframe&gt;'>{{ s.value_ne if s else '' }}</textarea>
+</div>
+{% set s = settings.get('whatsapp') %}
+<div class="form-group">
+  <label>WhatsApp number (display)</label>
+  <input type="text" name="whatsapp" class="form-control" value="{{ s.value_ne if s else '+977 9713799042' }}">
+</div>
+
+  <button type="submit" class="btn btn-primary">Save All Settings</button>
+</form>
+{% endblock %}

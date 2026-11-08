@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Page — {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="section-title text-center">{% if lang == "ne" %}पृष्ठ{% else %}Page{% endif %}</h1>
+    <p class="text-center" style="color:var(--text-muted);">Content is managed from the admin CMS. Extend seed data and editors as needed.</p>
+  </div>
+</section>
+{% endblock %}

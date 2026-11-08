@@ -1,0 +1,30 @@
+{% extends "admin/layout.html" %}
+{% block title %}Services{% endblock %}
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+  <h1>Services</h1>
+  <a href="{{ url_for('admin.service_new') }}" class="btn btn-primary">+ New Service</a>
+</div>
+{% for cat in categories %}
+<div class="card" style="padding:1.25rem; margin-bottom:1rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+    <h2 style="font-size:1.1rem;">{{ cat.name_en }} / {{ cat.name_ne }}</h2>
+    <a href="{{ url_for('admin.category_edit', id=cat.id) }}" class="btn btn-outline" style="padding:0.3rem 0.6rem;font-size:0.8rem;">Edit category</a>
+  </div>
+  <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+    {% for s in services if s.category_id == cat.id %}
+    <tr style="border-top:1px solid var(--border);">
+      <td style="padding:0.6rem 0;">{{ s.name_en }}</td>
+      <td style="width:90px;">{% if s.is_published %}Published{% else %}<span style="color:#999;">Draft</span>{% endif %}</td>
+      <td style="width:80px;">{% if s.is_featured %}Featured{% endif %}</td>
+      <td style="width:80px;">
+        <a href="{{ url_for('admin.service_edit', id=s.id) }}" class="btn btn-navy" style="padding:0.3rem 0.6rem; font-size:0.8rem;">Edit</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td style="padding:0.5rem 0; color:var(--text-muted);">No services in this category</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endfor %}
+{% endblock %}

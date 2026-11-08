@@ -1,0 +1,20 @@
+<nav class="admin-bottom-nav" aria-label="Admin mobile navigation">
+  <a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+    <span>📊</span><span>Dash</span>
+  </a>
+  <a href="{{ url_for('admin.bookings') }}" class="{% if request.endpoint and 'booking' in request.endpoint %}active{% endif %}">
+    <span>📋</span><span>Bookings</span>
+  </a>
+  <a href="{{ url_for('admin.messages') }}" class="{% if request.endpoint and 'message' in request.endpoint %}active{% endif %}">
+    <span>✉️</span><span>Msgs</span>
+  </a>
+  <a href="{{ url_for('admin.services') }}" class="{% if request.endpoint and 'service' in request.endpoint %}active{% endif %}">
+    <span>✦</span><span>Services</span>
+  </a>
+  <a href="{{ url_for('admin.ads_admin') }}" class="{% if request.endpoint and request.endpoint.startswith('admin.ad') %}active{% endif %}">
+    <span>📢</span><span>Ads</span>
+  </a>
+  <a href="{{ url_for('admin.settings') }}" class="{% if request.endpoint == 'admin.settings' %}active{% endif %}">
+    <span>⚙</span><span>Settings</span>
+  </a>
+</nav>

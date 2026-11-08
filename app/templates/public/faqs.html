@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}बारम्बार सोधिने प्रश्नहरू{% else %}FAQs{% endif %} — {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:800px;">
+    <h1 class="section-title text-center">
+      {% if lang == 'ne' %}बारम्बार सोधिने प्रश्नहरू{% else %}Frequently Asked Questions{% endif %}
+    </h1>
+    <p class="section-subtitle text-center" style="margin-left:auto;margin-right:auto;">
+      {% if lang == 'ne' %}तपाईंका सामान्य प्रश्नहरूको जवाफ{% else %}Answers to common questions{% endif %}
+    </p>
+
+    {% if faqs %}
+      {% for faq in faqs %}
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-body">
+          <h2 style="font-size:1.1rem; margin-bottom:0.5rem;">
+            {{ faq.question_ne if lang == 'ne' else faq.question_en }}
+          </h2>
+          <div style="color:var(--text-muted); line-height:1.7;">
+            {{ faq.answer_ne if lang == 'ne' else faq.answer_en }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-center" style="color:var(--text-muted);">
+        {% if lang == 'ne' %}अहिले FAQ उपलब्ध छैन।{% else %}No FAQs available yet.{% endif %}
+      </p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

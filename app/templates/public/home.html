@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+{% block title %}{{ app_name }} — {% if lang == "ne" %}एक प्लेटफर्म। हरेक सेवा।{% else %}One Platform. Every Service.{% endif %}{% endblock %}
+
+{% block content %}
+
+{% if popup_enabled %}
+<!-- Homepage popup notice (first load / refresh only) -->
+<div id="homePopup" class="home-popup-overlay" style="display:none;">
+  <div class="home-popup-card">
+    <button type="button" class="home-popup-close" id="homePopupClose" aria-label="Close">&times;</button>
+    {% set logo = setting('logo_url') %}
+    {% if logo %}
+    <img src="{{ logo }}" alt="{{ app_name }}" class="home-popup-logo">
+    {% else %}
+    <div class="logo-mark" style="margin:0 auto 1rem;">SR</div>
+    {% endif %}
+    {% if popup_image %}
+    <img src="{{ popup_image }}" alt="" style="width:100%; max-height:220px; object-fit:cover; border-radius:10px; margin:0.75rem 0;">
+    {% endif %}
+    {% if popup_title %}<h2 class="home-popup-title">{{ popup_title }}</h2>{% endif %}
+    {% if popup_body %}<div class="home-popup-body">{{ popup_body|safe }}</div>{% endif %}
+    <div class="home-popup-contact">
+      {% if setting('email') %}<p>✉️ <a href="mailto:{{ setting('email') }}">{{ setting('email') }}</a></p>{% endif %}
+      {% if branches %}
+        {% for b in branches[:2] %}
+          {% if b.phone %}<p>📞 {{ b.phone }}</p>{% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    <button type="button" class="btn btn-primary" id="homePopupOk" style="width:100%; margin-top:1rem;">
+      {% if lang == 'ne' %}बुझेँ{% else %}Got it{% endif %}
+    </button>
+  </div>
+</div>
+<script>
+(function(){
+  var KEY = 'sr_home_popup_until';
+  var DAY = 24 * 60 * 60 * 1000;
+  try {
+    var until = parseInt(localStorage.getItem(KEY) || '0', 10);
+    if (until && Date.now() < until) return;
+  } catch(e) {}
+  var el = document.getElementById('homePopup');
+  if (!el) return;
+  el.style.display = 'flex';
+  function close(){
+    el.style.display = 'none';
+    try { localStorage.setItem(KEY, String(Date.now() + DAY)); } catch(e) {}
+  }
+  var c = document.getElementById('homePopupClose');
+  var o = document.getElementById('homePopupOk');
+  if (c) c.addEventListener('click', close);
+  if (o) o.addEventListener('click', close);
+  el.addEventListener('click', function(e){ if (e.target === el) close(); });
+})();
+</script>
+{% endif %}
+
+<!-- Announcement bar -->
+{% set ann = sections.get('announcement') %}
+{% if ann and ann.is_enabled and (ann.title_ne or ann.title_en or ann.subtitle_ne or ann.subtitle_en or ann.content_ne or ann.content_en or ann.image_url) %}
+<div id="announcementBar" class="announcement-bar" style="
+  position:relative;
+  color:#fff;
+  padding:1.25rem 1rem;
+  text-align:center;
+  border-bottom:1px solid rgba(201,164,92,0.35);
+  {% if ann.image_url %}
+  background-image: linear-gradient(90deg, rgba(8,29,51,0.82), rgba(16,36,58,0.78)), url('{{ ann.image_url }}');
+  background-size: cover;
+  background-position: center;
+  {% else %}
+  background: linear-gradient(90deg,#081D33,#10243A);
+  {% endif %}
+">
+  <button type="button" class="announcement-close" id="announcementClose" aria-label="Close">&times;</button>
+  <div class="container" style="position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0.75rem;">
+    <div>
+      {% if ann.title_ne or ann.title_en %}
+      <strong style="color:var(--gold);">{{ ann.title_ne if lang == 'ne' else ann.title_en }}</strong>
+      {% endif %}
+      {% if ann.subtitle_ne or ann.subtitle_en %}
+      <span style="margin-left:0.5rem;opacity:0.95;">{{ ann.subtitle_ne if lang == 'ne' else ann.subtitle_en }}</span>
+      {% endif %}
+      {% if ann.content_ne or ann.content_en %}
+      <span style="margin-left:0.5rem;opacity:0.9;font-size:0.9rem;">{{ ann.content_ne if lang == 'ne' else ann.content_en }}</span>
+      {% endif %}
+    </div>
+    {% if ann.cta_url and (ann.cta_text_ne or ann.cta_text_en) %}
+    <a href="{{ ann.cta_url }}" class="btn btn-primary" style="padding:0.35rem 0.85rem;font-size:0.8rem;">{{ ann.cta_text_ne if lang == 'ne' else ann.cta_text_en }}</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+<script>
+(function(){
+  var KEY = 'sr_announcement_closed_v2';
+  var bar = document.getElementById('announcementBar');
+  var btn = document.getElementById('announcementClose');
+  if (!bar) return;
+  try {
+    if (localStorage.getItem(KEY) === '1') {
+      bar.style.display = 'none';
+      if (bar.parentNode) bar.parentNode.removeChild(bar);
+      return;
+    }
+  } catch(e) {}
+  if (btn) {
+    btn.onclick = function(ev){
+      if (ev) ev.preventDefault();
+      bar.style.display = 'none';
+      try { if (bar.parentNode) bar.parentNode.removeChild(bar); } catch(e) {}
+      try { localStorage.setItem(KEY, '1'); } catch(e) {}
+      return false;
+    };
+  }
+})();
+</script>
+
+<!-- Hero -->
+{% set hero = sections.get('hero') %}
+{% set hero_bg = (hero.image_url if hero and hero.image_url else setting('hero_bg_url')) %}
+<section class="hero" {% if hero_bg %}style="background-image: linear-gradient(135deg, rgba(8,29,51,0.85) 0%, rgba(16,36,58,0.75) 60%, rgba(26,58,92,0.7) 100%), url('{{ hero_bg }}'); background-size: cover; background-position: center;"{% endif %}>
+  <div class="container hero-content">
+    <h1>
+      {% if hero and (hero.title_ne or hero.title_en) %}
+        {{ hero.title_ne if lang == 'ne' else hero.title_en }}
+      {% elif lang == 'ne' %}
+        तपाईंको यात्रा,<br><span class="gold-text">हाम्रो जिम्मेवारी</span>
+      {% else %}
+        Your Journey,<br><span class="gold-text">Our Responsibility</span>
+      {% endif %}
+    </h1>
+    <p>
+      {% if hero and (hero.subtitle_ne or hero.subtitle_en) %}
+        {{ hero.subtitle_ne if lang == 'ne' else hero.subtitle_en }}
+      {% elif hero and (hero.content_ne or hero.content_en) %}
+        {{ hero.content_ne if lang == 'ne' else hero.content_en }}
+      {% elif lang == 'ne' %}
+        टिकटदेखि भिसा, टुरदेखि कागजात — सबै एकै ठाउँमा। SR All Service Hub Nepal सँग यात्रा सुरु गर्नुहोस्।
+      {% else %}
+        From tickets to visas, tours to documentation — all in one place. Start your journey with SR All Service Hub Nepal.
+      {% endif %}
+    </p>
+    <div class="hero-actions">
+      <a href="{{ hero.cta_url if hero and hero.cta_url else url_for('booking.index') }}" class="btn btn-primary">
+        {% if hero and (hero.cta_text_ne or hero.cta_text_en) %}
+          {{ hero.cta_text_ne if lang == 'ne' else hero.cta_text_en }}
+        {% elif lang == 'ne' %}अहिले बुक गर्नुहोस्{% else %}Book Now{% endif %}
+      </a>
+      <a href="{{ url_for('public.services') }}" class="btn btn-outline">
+        {% if lang == 'ne' %}सेवाहरू हेर्नुहोस्{% else %}Explore Services{% endif %}
+      </a>
+    </div>
+  </div>
+</section>
+
+{% with placement='home_top' %}{% include 'components/ad_slot.html' %}{% endwith %}
+
+<!-- Service Categories -->
+{% set cat_sec = sections.get('categories') %}
+<section class="section">
+  <div class="container">
+    <h2 class="section-title text-center">
+      {% if cat_sec %}{{ cat_sec.title_ne if lang == 'ne' else cat_sec.title_en }}{% else %}{% if lang == 'ne' %}हाम्रा सेवा श्रेणीहरू{% else %}Our Service Categories{% endif %}{% endif %}
+    </h2>
+    <p class="section-subtitle text-center" style="margin-left:auto;margin-right:auto;">
+      {% if cat_sec %}{{ cat_sec.subtitle_ne if lang == 'ne' else cat_sec.subtitle_en }}{% else %}{% if lang == 'ne' %}सात मुख्य श्रेणीमा पूर्ण सेवा{% else %}Complete services across seven main categories{% endif %}{% endif %}
+    </p>
+    <div class="grid-4">
+      {% for cat in categories %}
+      <a href="{{ url_for('public.services') }}#{{ cat.slug }}" class="card service-card" style="overflow:hidden;">
+        {% if cat.image_url %}
+        <img src="{{ cat.image_url }}" alt="{{ cat.get_name(lang) }}" style="width:100%;height:140px;object-fit:cover;display:block;">
+        {% endif %}
+        <div class="card-body">
+          <h3 style="font-size:1.1rem; margin-bottom:0.5rem;">{{ cat.get_name(lang) }}</h3>
+          <p style="font-size:0.9rem; color:var(--text-muted);">{{ cat.get_description(lang)|truncate(80) }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Popular Services -->
+{% set pop_sec = sections.get('popular') %}
+{% if featured_services %}
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">{% if pop_sec %}{{ pop_sec.title_ne if lang == 'ne' else pop_sec.title_en }}{% else %}{% if lang == 'ne' %}लोकप्रिय सेवाहरू{% else %}Popular Services{% endif %}{% endif %}</h2>
+    <div class="grid-3">
+      {% for s in featured_services %}
+      <div class="card">
+        {% if s.image_url %}<img src="{{ s.image_url }}" alt="" style="width:100%;height:160px;object-fit:cover;">{% endif %}
+        <div class="card-body">
+          <h3 style="font-size:1.15rem;">{{ s.get_name(lang) }}</h3>
+          <p style="color:var(--text-muted); font-size:0.95rem; margin:0.75rem 0;">{{ s.get_short_desc(lang) }}</p>
+          <a href="{{ url_for('public.service_detail', slug=s.slug) }}" class="btn btn-navy" style="padding:0.5rem 1rem; font-size:0.85rem;">
+            {% if lang == 'ne' %}थप जान्नुहोस्{% else %}Learn More{% endif %}
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Destinations on home -->
+{% set dest_sec = sections.get('destinations_home') %}
+{% if destinations %}
+<section class="section">
+  <div class="container">
+    <h2 class="section-title text-center">
+      {% if dest_sec %}{{ dest_sec.title_ne if lang == 'ne' else dest_sec.title_en }}{% else %}{% if lang == 'ne' %}लोकप्रिय गन्तव्यहरू{% else %}Popular Destinations{% endif %}{% endif %}
+    </h2>
+    {% if dest_sec and (dest_sec.subtitle_ne or dest_sec.subtitle_en) %}
+    <p class="section-subtitle text-center" style="margin-left:auto;margin-right:auto;">{{ dest_sec.subtitle_ne if lang == 'ne' else dest_sec.subtitle_en }}</p>
+    {% endif %}
+    <div class="grid-4" style="margin-top:1.5rem;">
+      {% for d in destinations %}
+      <a href="{{ url_for('public.destination_inquire', slug=d.slug) }}" class="card" style="text-decoration:none;color:inherit;">
+        {% if d.image_url %}<img src="{{ d.image_url }}" alt="" style="width:100%;height:140px;object-fit:cover;">{% endif %}
+        <div class="card-body">
+          <h3 style="font-size:1.05rem;">{{ d.name_ne if lang == 'ne' else d.name_en }}</h3>
+          {% if d.country %}<p style="font-size:0.8rem;color:var(--gold);">{{ d.country }}</p>{% endif %}
+          <p style="font-size:0.85rem;color:var(--text-muted);">{{ ((d.description_ne if lang == 'ne' else d.description_en) or '')[:80] }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    <div class="text-center" style="margin-top:1.25rem;">
+      <a href="{{ url_for('public.destinations') }}" class="btn btn-outline">{% if lang == 'ne' %}सबै गन्तव्य{% else %}All destinations{% endif %}</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Why Choose Us -->
+{% set why = sections.get('why_us') %}
+<section class="section">
+  <div class="container">
+    <h2 class="section-title text-center">{% if why %}{{ why.title_ne if lang == 'ne' else why.title_en }}{% else %}{% if lang == 'ne' %}किन हामीलाई रोज्ने?{% else %}Why Choose Us?{% endif %}{% endif %}</h2>
+    {% if why and (why.subtitle_ne or why.subtitle_en) %}
+    <p class="section-subtitle text-center" style="margin-left:auto;margin-right:auto;">{{ why.subtitle_ne if lang == 'ne' else why.subtitle_en }}</p>
+    {% endif %}
+    <div class="grid-3" style="margin-top:2rem;">
+      {% for key in ['why_1','why_2','why_3'] %}
+      {% set box = sections.get(key) %}
+      {% if box %}
+      <div class="card">
+        {% if box.image_url %}<img src="{{ box.image_url }}" alt="" style="width:100%;height:180px;object-fit:cover;">{% endif %}
+        <div class="card-body text-center">
+          {% if not box.image_url %}<div style="font-size:2rem; margin-bottom:0.75rem;">✦</div>{% endif %}
+          <h3 style="font-size:1.1rem;">{{ box.title_ne if lang == 'ne' else box.title_en }}</h3>
+          <p style="color:var(--text-muted); font-size:0.9rem;">{{ box.content_ne if lang == 'ne' else box.content_en }}</p>
+          {% if box.cta_url and (box.cta_text_ne or box.cta_text_en) %}
+          <a href="{{ box.cta_url }}" class="btn btn-navy" style="margin-top:0.75rem;padding:0.4rem 0.9rem;font-size:0.85rem;">{{ box.cta_text_ne if lang == 'ne' else box.cta_text_en }}</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% if why and why.cta_url and (why.cta_text_ne or why.cta_text_en) %}
+    <div class="text-center" style="margin-top:1.5rem;">
+      <a href="{{ why.cta_url }}" class="btn btn-primary">{{ why.cta_text_ne if lang == 'ne' else why.cta_text_en }}</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Booking Process -->
+{% set proc = sections.get('process') %}
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title text-center">{% if proc %}{{ proc.title_ne if lang == 'ne' else proc.title_en }}{% else %}{% if lang == 'ne' %}अनलाइन बुकिङ प्रक्रिया{% else %}Online Booking Process{% endif %}{% endif %}</h2>
+    {% if proc and (proc.subtitle_ne or proc.subtitle_en) %}
+    <p class="section-subtitle text-center" style="margin-left:auto;margin-right:auto;">{{ proc.subtitle_ne if lang == 'ne' else proc.subtitle_en }}</p>
+    {% endif %}
+    <div class="grid-4 process-steps-large" style="margin-top:2.5rem;">
+      {% for key in ['process_1','process_2','process_3','process_4'] %}
+      {% set step = sections.get(key) %}
+      {% if step %}
+      <div class="card process-step-card" style="text-align:center;">
+        {% if step.image_url %}
+        <img src="{{ step.image_url }}" alt="" style="width:100%;height:160px;object-fit:cover;display:block;">
+        {% else %}
+        <div style="height:100px;background:linear-gradient(135deg,#081D33,#1a3a5c);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:2rem;font-weight:700;">{{ loop.index }}</div>
+        {% endif %}
+        <div class="card-body">
+          <h4 style="font-size:1.05rem;margin-bottom:0.35rem;">{{ step.title_ne if lang == 'ne' else step.title_en }}</h4>
+          <p style="font-size:0.9rem; color:var(--text-muted);">{{ step.content_ne if lang == 'ne' else step.content_en }}</p>
+          {% if step.cta_url and (step.cta_text_ne or step.cta_text_en) %}
+          <a href="{{ step.cta_url }}" class="btn btn-navy" style="margin-top:0.5rem;padding:0.35rem 0.8rem;font-size:0.8rem;">{{ step.cta_text_ne if lang == 'ne' else step.cta_text_en }}</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% if proc and proc.cta_url and (proc.cta_text_ne or proc.cta_text_en) %}
+    <div class="text-center" style="margin-top:1.75rem;">
+      <a href="{{ proc.cta_url }}" class="btn btn-primary">{{ proc.cta_text_ne if lang == 'ne' else proc.cta_text_en }}</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- FAQs -->
+{% if faqs %}
+<section class="section">
+  <div class="container" style="max-width:800px;">
+    <h2 class="section-title text-center">{% if lang == 'ne' %}बारम्बार सोधिने प्रश्नहरू{% else %}Frequently Asked Questions{% endif %}</h2>
+    {% for faq in faqs %}
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="card-body">
+        <h3 style="font-size:1.05rem; margin-bottom:0.5rem;">{{ faq.question_ne if lang == 'ne' else faq.question_en }}</h3>
+        <p style="color:var(--text-muted); font-size:0.95rem;">{{ faq.answer_ne if lang == 'ne' else faq.answer_en }}</p>
+      </div>
+    </div>
+    {% endfor %}
+    <div class="text-center mt-4">
+      <a href="{{ url_for('public.faqs') }}" class="btn btn-outline">{% if lang == 'ne' %}सबै FAQ{% else %}All FAQs{% endif %}</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Contact CTA -->
+<section class="section" style="background:var(--navy); color:white;">
+  <div class="container text-center">
+    <h2 style="color:white; margin-bottom:1rem;">{% if lang == 'ne' %}तयार हुनुहुन्छ?{% else %}Ready to get started?{% endif %}</h2>
+    <p style="opacity:0.9; margin-bottom:1.5rem; max-width:500px; margin-left:auto; margin-right:auto;">
+      {% if lang == 'ne' %}आज नै सम्पर्क गर्नुहोस् वा अनलाइन बुक गर्नुहोस्।{% else %}Contact us today or book online.{% endif %}
+    </p>
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+      <a href="{{ url_for('booking.index') }}" class="btn btn-primary">{% if lang == 'ne' %}बुक गर्नुहोस्{% else %}Book Now{% endif %}</a>
+      <a href="{{ url_for('public.contact') }}" class="btn btn-outline">{% if lang == 'ne' %}सम्पर्क{% else %}Contact Us{% endif %}</a>
+    </div>
+  </div>
+</section>
+
+
+
+
+{% with placement='home_mid' %}{% include 'components/ad_slot.html' %}{% endwith %}
+<section class="section home-reviews">
+  <div class="container">
+    <h2 class="section-title">{% if lang == 'ne' %}ग्राहक प्रतिक्रिया{% else %}Customer Reviews{% endif %}</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.25rem;">
+      {% for r in testimonials %}
+      <div class="card" style="padding:1.25rem;">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+          {% if r.image_url %}<img src="{{ r.image_url }}" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">{% else %}
+          <span style="width:48px;height:48px;border-radius:50%;background:var(--navy);color:var(--gold);display:inline-flex;align-items:center;justify-content:center;font-weight:700;">{{ r.customer_name[:1]|upper }}</span>{% endif %}
+          <div><strong>{{ r.customer_name }}</strong>{% if r.mobile %}<div style="font-size:0.85rem;opacity:0.7;">{{ r.mobile }}</div>{% endif %}
+          <div style="color:var(--gold);">{{ '★' * (r.rating or 5) }}</div></div>
+        </div>
+        <p style="margin:0;line-height:1.55;">{{ r.content_ne if lang == 'ne' else (r.content_en or r.content_ne) }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    <p style="text-align:center;margin-top:1.25rem;"><a href="{{ url_for('public.testimonials') }}" class="btn btn-outline">{% if lang == 'ne' %}सबै प्रतिक्रिया{% else %}All reviews{% endif %}</a></p>
+  </div>
+</section>
+
+
+{% with placement='home_bottom' %}{% include 'components/ad_slot.html' %}{% endwith %}
+{% endblock %}

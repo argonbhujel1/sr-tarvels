@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{% if service %}{{ service.get_name(lang) }}{% else %}{% if lang == 'ne' %}सेवा अनुरोध{% else %}Service Request{% endif %}{% endif %}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:680px;">
+    <h1 class="section-title">
+      {% if service %}{{ service.get_name(lang) }}{% else %}{% if lang == 'ne' %}सेवा अनुरोध{% else %}Service Request{% endif %}{% endif %}
+    </h1>
+
+    {% if service and (service.get_requirements(lang) or service.requires_documents) %}
+    <div class="card" style="padding:1.25rem; margin-bottom:1.5rem; background:#fffbeb; border:1px solid #fde68a;">
+      <h3 style="font-size:1rem; margin-bottom:0.5rem; color:#92400e;">
+        {% if lang == 'ne' %}आवश्यक कागजात{% else %}Required Documents{% endif %}
+      </h3>
+      <div style="font-size:0.95rem; color:#78350f;">{{ service.get_requirements(lang)|safe }}</div>
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="card" style="padding:2rem;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="booking_type" value="{{ service.slug if service else 'inquiry' }}">
+
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}पूरा नाम *{% else %}Full Name *{% endif %}</label>
+        <input type="text" name="full_name" class="form-control" required value="{{ current_user.full_name if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' else '' }}">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}मोबाइल *{% else %}Mobile *{% endif %}</label>
+          <input type="tel" name="mobile" class="form-control" placeholder="+977..." value="{{ current_user.mobile if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" class="form-control" value="{{ current_user.email if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' else '' }}">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}विवरण / आवश्यकता *{% else %}Details / Requirements *{% endif %}</label>
+        <textarea name="special_requests" class="form-control" required rows="4"></textarea>
+      </div>
+
+      {% if service and service.requires_documents %}
+      <div class="form-group">
+        <label>
+          {% if lang == 'ne' %}कागजात अपलोड गर्नुहोस् *{% else %}Upload Documents *{% endif %}
+          <span style="font-weight:400; color:var(--text-muted); font-size:0.85rem;">(PDF, JPG, PNG)</span>
+        </label>
+        <input type="file" name="documents" class="form-control" multiple
+               accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx" required>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.35rem;">
+          {% if lang == 'ne' %}पासपोर्ट, फोटो, निवेदन वा अन्य आवश्यक कागजात संलग्न गर्नुहोस्।{% else %}Attach passport, photos, application or other required documents.{% endif %}
+        </p>
+      </div>
+      {% else %}
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}कागजात अपलोड (ऐच्छिक){% else %}Upload Documents (optional){% endif %}</label>
+        <input type="file" name="documents" class="form-control" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx">
+      </div>
+      {% endif %}
+
+      {% include "components/payment_proof.html" %}
+      <button type="submit" class="btn btn-primary" style="width:100%;">
+        {% if lang == 'ne' %}अनुरोध पेश गर्नुहोस्{% else %}Submit Request{% endif %}
+      </button>
+    </form>
+  </div>
+</section>
+{% endblock %}

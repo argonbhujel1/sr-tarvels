@@ -1,0 +1,84 @@
+{% extends "admin/layout.html" %}
+{% block title %}Edit Section{% endblock %}
+{% block content %}
+<h1 style="margin-bottom:1.5rem;">Edit: {{ section.key }}</h1>
+<form method="post" enctype="multipart/form-data" class="card" style="padding:1.5rem; max-width:800px;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Title (Nepali)</label>
+      <input type="text" name="title_ne" class="form-control" value="{{ section.title_ne or '' }}">
+    </div>
+    <div class="form-group">
+      <label>Title (English)</label>
+      <input type="text" name="title_en" class="form-control" value="{{ section.title_en or '' }}">
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Subtitle (Nepali)</label>
+      <textarea name="subtitle_ne" class="form-control" rows="2">{{ section.subtitle_ne or '' }}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Subtitle (English)</label>
+      <textarea name="subtitle_en" class="form-control" rows="2">{{ section.subtitle_en or '' }}</textarea>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Content / box text (Nepali)</label>
+      <textarea name="content_ne" class="form-control" rows="4">{{ section.content_ne or '' }}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Content / box text (English)</label>
+      <textarea name="content_en" class="form-control" rows="4">{{ section.content_en or '' }}</textarea>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="form-group">
+      <label>CTA Text (Nepali)</label>
+      <input type="text" name="cta_text_ne" class="form-control" value="{{ section.cta_text_ne or '' }}">
+    </div>
+    <div class="form-group">
+      <label>CTA Text (English)</label>
+      <input type="text" name="cta_text_en" class="form-control" value="{{ section.cta_text_en or '' }}">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>CTA URL</label>
+    <input type="text" name="cta_url" class="form-control" value="{{ section.cta_url or '' }}">
+  </div>
+
+  <div class="form-group">
+    <label>Image URL (link)</label>
+    <input type="text" name="image_url" class="form-control" value="{{ section.image_url or '' }}" placeholder="https://... or leave blank and upload">
+  </div>
+  <div class="form-group">
+    <label>Or upload image (file picker)</label>
+    <input type="file" name="image_file" class="form-control" accept="image/*">
+    {% if section.image_url %}
+    <p style="margin-top:0.5rem;"><img src="{{ section.image_url }}" alt="" style="max-height:120px; border-radius:8px; border:1px solid var(--border);"></p>
+    {% endif %}
+  </div>
+
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Sort Order</label>
+      <input type="number" name="sort_order" class="form-control" value="{{ section.sort_order or 0 }}">
+    </div>
+    <div class="form-group" style="display:flex; align-items:center; gap:0.5rem; padding-top:1.5rem;">
+      <label><input type="checkbox" name="is_enabled" {% if section.is_enabled %}checked{% endif %}> Enabled on homepage</label>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:0.75rem; margin-top:1rem;">
+    <button type="submit" class="btn btn-primary">Save Section</button>
+    <a href="{{ url_for('admin.homepage') }}" class="btn btn-outline">Cancel</a>
+  </div>
+</form>
+{% endblock %}

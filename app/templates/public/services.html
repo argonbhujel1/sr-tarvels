@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}सेवाहरू{% else %}Services{% endif %} — {{ app_name }}{% endblock %}
+
+{% block content %}
+{% with placement='services' %}{% include 'components/ad_slot.html' %}{% endwith %}
+<section class="section">
+  <div class="container">
+    <h1 class="section-title text-center">{% if lang == 'ne' %}हाम्रा सेवाहरू{% else %}Our Services{% endif %}</h1>
+    {% for cat in categories %}
+    <div id="{{ cat.slug }}" style="margin-bottom:3rem;">
+      <h2 style="font-size:1.5rem; margin-bottom:1rem; color:var(--navy);">{{ cat.get_name(lang) }}</h2>
+      <p style="color:var(--text-muted); margin-bottom:1.5rem;">{{ cat.get_description(lang) }}</p>
+      <div class="grid-3">
+        {% for s in cat.services.filter_by(is_published=True).all() %}
+        <div class="card">
+          <div class="card-body">
+            <h3 style="font-size:1.1rem;">{{ s.get_name(lang) }}</h3>
+            <p style="font-size:0.9rem; color:var(--text-muted); margin:0.5rem 0 1rem;">{{ s.get_short_desc(lang) }}</p>
+            <a href="{{ url_for('public.service_detail', slug=s.slug) }}" class="btn btn-navy" style="padding:0.45rem 1rem; font-size:0.85rem;">
+              {% if lang == 'ne' %}विवरण{% else %}Details{% endif %}
+            </a>
+          </div>
+        </div>
+        {% else %}
+        <p style="color:var(--text-muted);">{% if lang == 'ne' %}सेवाहरू चाँडै थपिनेछन्।{% else %}Services coming soon.{% endif %}</p>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "emails/base_email.html" %}
+{% block content %}
+  <h2 style="margin:0 0 12px;color:#10243A;font-size:22px;">New contact form message</h2>
+  <p style="margin:0 0 16px;color:#555;line-height:1.55;">
+    A visitor submitted the <strong>Contact</strong> page. Please reply using their email or phone.
+  </p>
+  <table width="100%" style="border-collapse:collapse;background:#F6F8FA;border-radius:8px;font-size:14px;">
+    <tr><td style="padding:10px 14px;border-bottom:1px solid #e5e9ef;width:110px;color:#666;">Name</td><td style="padding:10px 14px;border-bottom:1px solid #e5e9ef;"><strong>{{ name }}</strong></td></tr>
+    <tr><td style="padding:10px 14px;border-bottom:1px solid #e5e9ef;color:#666;">Email</td><td style="padding:10px 14px;border-bottom:1px solid #e5e9ef;">{{ email_from }}</td></tr>
+    <tr><td style="padding:10px 14px;border-bottom:1px solid #e5e9ef;color:#666;">Mobile</td><td style="padding:10px 14px;border-bottom:1px solid #e5e9ef;">{{ mobile }}</td></tr>
+    <tr><td style="padding:10px 14px;border-bottom:1px solid #e5e9ef;color:#666;">Subject</td><td style="padding:10px 14px;border-bottom:1px solid #e5e9ef;">{{ subject }}</td></tr>
+    <tr><td style="padding:10px 14px;color:#666;vertical-align:top;">Message</td><td style="padding:10px 14px;white-space:pre-wrap;">{{ message }}</td></tr>
+  </table>
+{% endblock %}

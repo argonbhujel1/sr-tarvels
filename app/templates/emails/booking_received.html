@@ -1,0 +1,39 @@
+{% extends "emails/base_email.html" %}
+{% block content %}
+  <h2 style="margin:0 0 12px;color:#10243A;font-size:22px;">
+    {% if lang == 'ne' %}बुकिङ प्राप्त भयो{% else %}Booking received{% endif %}
+  </h2>
+  <p style="margin:0 0 16px;line-height:1.65;color:#333;">
+    {% if lang == 'ne' %}
+    नमस्ते <strong>{{ name }}</strong>,<br>
+    तपाईंको बुकिङ अनुरोध हामीले प्राप्त गर्यौं। हाम्रो टिम समीक्षा गरेर चाँडै सम्पर्क गर्नेछ।
+    {% else %}
+    Hello <strong>{{ name }}</strong>,<br>
+    We have received your booking request. Our team will review it and contact you soon.
+    {% endif %}
+  </p>
+  <table width="100%" style="border-collapse:collapse;background:#F6F8FA;border-radius:8px;font-size:14px;">
+    <tr>
+      <td style="padding:12px 14px;border-bottom:1px solid #e5e9ef;color:#666;width:140px;">
+        {% if lang == 'ne' %}बुकिङ नम्बर{% else %}Booking number{% endif %}
+      </td>
+      <td style="padding:12px 14px;border-bottom:1px solid #e5e9ef;"><strong style="color:#10243A;letter-spacing:0.03em;">{{ reference }}</strong></td>
+    </tr>
+    {% if service_name %}
+    <tr>
+      <td style="padding:12px 14px;border-bottom:1px solid #e5e9ef;color:#666;">{% if lang == 'ne' %}सेवा{% else %}Service{% endif %}</td>
+      <td style="padding:12px 14px;border-bottom:1px solid #e5e9ef;">{{ service_name }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+      <td style="padding:12px 14px;color:#666;">{% if lang == 'ne' %}स्थिति{% else %}Status{% endif %}</td>
+      <td style="padding:12px 14px;">{{ status or 'Pending' }}</td>
+    </tr>
+  </table>
+  <p style="text-align:center;margin:24px 0 8px;">
+    <a href="{{ track_url }}" style="display:inline-block;background:#10243A;color:#fff;text-decoration:none;font-weight:700;padding:12px 26px;border-radius:8px;">
+      {% if lang == 'ne' %}बुकिङ ट्र्याक गर्नुहोस्{% else %}Track your booking{% endif %}
+    </a>
+  </p>
+  <p style="font-size:12px;color:#888;text-align:center;word-break:break-all;">{{ track_url }}</p>
+{% endblock %}

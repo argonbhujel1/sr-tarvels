@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /privacy
+Allow: /data-deletion
+Allow: /data-deletion//
+Allow: /privacy
+Allow: /data-deletion
+Allow: /data-deletion/
+User-agent: *
+Allow: /
+Disallow: /admin/
+Sitemap: /sitemap.xml

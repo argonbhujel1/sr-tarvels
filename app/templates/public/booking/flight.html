@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}उडान टिकट बुक{% else %}Book Flight{% endif %}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:640px;">
+    <h1 class="section-title">{% if lang == 'ne' %}उडान टिकट बुकिङ{% else %}Flight Ticket Booking{% endif %}</h1>
+    <form method="post" class="card" style="padding:2rem;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}यात्रा प्रकार{% else %}Trip Type{% endif %}</label>
+        <select name="trip_type" class="form-control" required>
+          <option value="one-way">{% if lang == 'ne' %}एकतर्फी{% else %}One Way{% endif %}</option>
+          <option value="round-trip">{% if lang == 'ne' %}दुईतर्फी{% else %}Round Trip{% endif %}</option>
+        </select>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}प्रस्थान{% else %}Departure{% endif %}</label>
+          <input type="text" name="departure" class="form-control" required placeholder="Kathmandu / KTM">
+        </div>
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}गन्तव्य{% else %}Destination{% endif %}</label>
+          <input type="text" name="destination" class="form-control" required placeholder="Pokhara / PKR">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}प्रस्थान मिति{% else %}Departure Date{% endif %}</label>
+          <input type="date" name="departure_date" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}फिर्ता मिति{% else %}Return Date{% endif %}</label>
+          <input type="date" name="return_date" class="form-control">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}यात्री संख्या{% else %}Passengers{% endif %}</label>
+          <input type="number" name="passengers" class="form-control" min="1" value="1" required>
+        </div>
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}कक्षा{% else %}Class{% endif %}</label>
+          <select name="travel_class" class="form-control">
+            <option value="economy">Economy</option>
+            <option value="business">Business</option>
+          </select>
+        </div>
+      </div>
+      <hr style="margin:1.5rem 0; border:none; border-top:1px solid var(--border);">
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}पूरा नाम{% else %}Full Name{% endif %}</label>
+        <input type="text" name="full_name" class="form-control" required value="{{ current_user.full_name if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' else '' }}">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>{% if lang == 'ne' %}मोबाइल{% else %}Mobile{% endif %}</label>
+          <input type="tel" name="mobile" class="form-control" placeholder="+977..." value="{{ current_user.mobile if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" class="form-control" value="{{ current_user.email if current_user.is_authenticated and current_user.__class__.__name__ == 'Customer' else '' }}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{% if lang == 'ne' %}विशेष अनुरोध{% else %}Special Requests{% endif %}</label>
+        <textarea name="special_requests" class="form-control"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">
+        {% if lang == 'ne' %}बुकिङ पेश गर्नुहोस्{% else %}Submit Booking{% endif %}
+      </button>
+    </form>
+  </div>
+</section>
+{% endblock %}

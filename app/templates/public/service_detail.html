@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ service.get_name(lang) }} — {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:860px;">
+    {% if service.image_url %}
+    <img src="{{ service.image_url }}" alt="{{ service.get_name(lang) }}"
+         style="width:100%; max-height:320px; object-fit:cover; border-radius:var(--radius); margin-bottom:1.5rem;">
+    {% endif %}
+
+    <p style="font-size:0.85rem; color:var(--gold); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">
+      {{ service.category.get_name(lang) if service.category else '' }}
+    </p>
+    <h1 class="section-title" style="margin-top:0.35rem;">{{ service.get_name(lang) }}</h1>
+    <p style="font-size:1.1rem; color:var(--text-muted); margin-bottom:2rem;">{{ service.get_short_desc(lang) }}</p>
+
+    {% if service.get_description(lang) %}
+    <div class="card" style="padding:1.5rem; margin-bottom:1.25rem;">
+      <h2 style="font-size:1.15rem; margin-bottom:0.75rem;">{% if lang == 'ne' %}सेवा विवरण{% else %}Service Details{% endif %}</h2>
+      <div class="page-type-body" style="line-height:1.75;">{{ service.get_description(lang)|safe }}</div>
+    </div>
+    {% endif %}
+
+    {% set req_text = service.get_requirements(lang) %}
+    {% if req_text or service.requires_documents %}
+    <div class="card" style="padding:1.5rem; margin-bottom:1.25rem; border-left:4px solid var(--gold);">
+      <h2 style="font-size:1.15rem; margin-bottom:0.75rem;">
+        {% if lang == 'ne' %}आवश्यक कागजात / आवश्यकताहरू{% else %}Required Documents / Requirements{% endif %}
+      </h2>
+      {% if req_text %}
+      <div class="page-type-body" style="line-height:1.75; white-space:pre-wrap;">{{ req_text }}</div>
+      {% else %}
+      <div class="page-type-body" style="line-height:1.75;">
+        {% if lang == 'ne' %}यो सेवाका लागि कागजात आवश्यक छ। बुकिङ गर्दा पासपोर्ट, फोटो वा अन्य माग अनुसारका कागजात अपलोड गर्नुहोस्।{% else %}Documents are required for this service. Please upload passport, photos or other documents as needed when booking.{% endif %}
+      </div>
+      {% endif %}
+      {% if service.requires_documents %}
+      <p style="margin-top:1rem; font-size:0.9rem; color:var(--navy); font-weight:500;">
+        {% if lang == 'ne' %}⚠ बुकिङ फारममा फाइल संलग्न गर्न अनिवार्य छ।{% else %}⚠ File upload is required on the booking form.{% endif %}
+      </p>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if service.price_npr %}
+    <div class="card" style="padding:1.25rem; margin-bottom:1.25rem; border-left:4px solid var(--gold);">
+      <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:0.25rem;">{% if lang == 'ne' %}मूल्य{% else %}Price{% endif %}</p>
+      <p style="font-size:1.5rem; font-weight:700; color:var(--navy);">NPR {{ service.price_npr }}</p>
+    </div>
+    {% endif %}
+    {% if service.get_pricing(lang) %}
+    <div class="card" style="padding:1.5rem; margin-bottom:1.25rem;">
+      <h2 style="font-size:1.15rem; margin-bottom:0.75rem;">{% if lang == 'ne' %}मूल्य जानकारी{% else %}Pricing Information{% endif %}</h2>
+      <div>{{ service.get_pricing(lang)|safe }}</div>
+    </div>
+    {% endif %}
+
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1.5rem;">
+      <a href="{{ url_for('booking.general', service=service.slug) }}" class="btn btn-primary">
+        {% if lang == 'ne' %}यो सेवा बुक / अनुरोध गर्नुहोस्{% else %}Book / Request This Service{% endif %}
+      </a>
+      <a href="{{ url_for('public.contact') }}" class="btn btn-outline">
+        {% if lang == 'ne' %}सोधपुछ गर्नुहोस्{% else %}Ask a Question{% endif %}
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

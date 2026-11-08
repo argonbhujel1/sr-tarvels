@@ -1,0 +1,38 @@
+{% extends "admin/layout.html" %}
+{% block title %}{{ 'New FAQ' if not faq else 'Edit FAQ' }}{% endblock %}
+{% block content %}
+<h1 style="margin-bottom:1.5rem;">{{ 'New FAQ' if not faq else 'Edit FAQ' }}</h1>
+<form method="post" class="card" style="padding:1.5rem; max-width:800px;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-group">
+    <label>Question (Nepali)</label>
+    <input type="text" name="question_ne" class="form-control" value="{{ faq.question_ne if faq else '' }}" required>
+  </div>
+  <div class="form-group">
+    <label>Question (English)</label>
+    <input type="text" name="question_en" class="form-control" value="{{ faq.question_en if faq else '' }}" required>
+  </div>
+  <div class="form-group">
+    <label>Answer (Nepali)</label>
+    <textarea name="answer_ne" class="form-control" rows="4" required>{{ faq.answer_ne if faq else '' }}</textarea>
+  </div>
+  <div class="form-group">
+    <label>Answer (English)</label>
+    <textarea name="answer_en" class="form-control" rows="4" required>{{ faq.answer_en if faq else '' }}</textarea>
+  </div>
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Sort Order</label>
+      <input type="number" name="sort_order" class="form-control" value="{{ faq.sort_order if faq else 0 }}">
+    </div>
+    <div class="form-group" style="padding-top:1.5rem;">
+      <label style="display:block;margin-bottom:0.5rem;"><input type="checkbox" name="is_published" {% if not faq or faq.is_published %}checked{% endif %}> Published</label>
+      <label><input type="checkbox" name="is_featured" {% if faq and faq.is_featured %}checked{% endif %}> Featured (show on homepage)</label>
+    </div>
+  </div>
+  <div style="display:flex; gap:0.75rem;">
+    <button type="submit" class="btn btn-primary">Save FAQ</button>
+    <a href="{{ url_for('admin.faqs') }}" class="btn btn-outline">Cancel</a>
+  </div>
+</form>
+{% endblock %}

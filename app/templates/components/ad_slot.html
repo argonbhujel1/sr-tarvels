@@ -1,0 +1,25 @@
+{% set ads = ads_for(placement) if ads_for else [] %}
+{% if ads %}
+<div class="ad-slot ad-slot-{{ placement }}" data-placement="{{ placement }}">
+  {% for ad in ads %}
+  <div class="ad-item">
+    {% if ad.html_code %}
+      <div class="ad-html">{{ ad.html_code|safe }}</div>
+    {% elif ad.image_url %}
+      {% if ad.link_url %}
+      <a href="{{ ad.link_url }}" target="_blank" rel="noopener sponsored nofollow" class="ad-link">
+        <img src="{{ ad.image_url }}" alt="{{ ad.title }}" class="ad-img" loading="lazy">
+      </a>
+      {% else %}
+      <img src="{{ ad.image_url }}" alt="{{ ad.title }}" class="ad-img" loading="lazy">
+      {% endif %}
+    {% elif ad.link_url %}
+      <a href="{{ ad.link_url }}" target="_blank" rel="noopener sponsored nofollow" class="ad-text-link">{{ ad.title }}</a>
+    {% else %}
+      <div class="ad-text-fallback">{{ ad.title }}</div>
+    {% endif %}
+    <span class="ad-label">Ad</span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}

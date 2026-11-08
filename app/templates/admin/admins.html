@@ -1,0 +1,37 @@
+{% extends "admin/layout.html" %}
+{% block title %}Admin accounts{% endblock %}
+{% block content %}
+<h1 style="margin-bottom:1rem;">Admin accounts</h1>
+<p style="color:var(--text-muted);margin-bottom:1.5rem;font-size:0.95rem;">
+  Only these emails can sign in with <strong>Google / Facebook</strong> on the admin login page.
+  The default password admin still works with email + password.
+</p>
+<div class="card" style="padding:0;overflow:auto;margin-bottom:1.5rem;">
+  <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+    <thead>
+      <tr style="text-align:left;background:#f8fafc;border-bottom:1px solid var(--border);">
+        <th style="padding:0.75rem;">Name</th>
+        <th style="padding:0.75rem;">Email</th>
+        <th style="padding:0.75rem;">Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in admins %}
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:0.75rem;">{{ a.full_name }}</td>
+        <td style="padding:0.75rem;">{{ a.email }}</td>
+        <td style="padding:0.75rem;">{{ a.role }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<form method="post" class="card" style="padding:1.5rem;max-width:480px;">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <h2 style="font-size:1.1rem;margin-bottom:1rem;">Add admin email</h2>
+  <div class="form-group"><label>Full name</label><input type="text" name="full_name" class="form-control"></div>
+  <div class="form-group"><label>Email</label><input type="email" name="email" class="form-control" required></div>
+  <div class="form-group"><label>Password (optional — for email login)</label><input type="password" name="password" class="form-control"></div>
+  <button type="submit" class="btn btn-primary">Add admin</button>
+</form>
+{% endblock %}

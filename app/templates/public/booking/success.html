@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{% if lang == 'ne' %}बुकिङ सफल{% else %}Booking Successful{% endif %}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container text-center" style="max-width:560px;">
+    <div style="font-size:4rem; margin-bottom:1rem;">✓</div>
+    <h1 class="section-title">{% if lang == 'ne' %}बुकिङ प्राप्त भयो!{% else %}Booking Received!{% endif %}</h1>
+    <p class="section-subtitle" style="margin-left:auto;margin-right:auto;">
+      {% if lang == 'ne' %}
+        तपाईंको बुकिङ सफलतापूर्वक दर्ता भयो। रेफरेन्स नम्बर सुरक्षित राख्नुहोस्।
+      {% else %}
+        Your booking has been successfully registered. Please keep the reference number safe.
+      {% endif %}
+    </p>
+    {% if reference %}
+    <div class="card" style="padding:1.5rem; margin:1.5rem 0;">
+      <p style="font-size:0.9rem; color:var(--text-muted);">{% if lang == 'ne' %}बुकिङ रेफरेन्स{% else %}Booking Reference{% endif %}</p>
+      <p style="font-size:1.75rem; font-weight:700; color:var(--navy); letter-spacing:0.05em;">{{ reference }}</p>
+    </div>
+    {% endif %}
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+      <a href="{{ url_for('booking.track', ref=reference) }}" class="btn btn-primary">
+        {% if lang == 'ne' %}ट्र्याक गर्नुहोस्{% else %}Track Booking{% endif %}
+      </a>
+      <a href="{{ url_for('public.home') }}" class="btn btn-outline">
+        {% if lang == 'ne' %}गृह पृष्ठ{% else %}Home{% endif %}
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

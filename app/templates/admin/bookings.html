@@ -1,0 +1,48 @@
+{% extends "admin/layout.html" %}
+{% block title %}Bookings{% endblock %}
+{% block content %}
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1.5rem;">
+  <h1 style="margin:0;">Bookings</h1>
+  <form method="post" action="{{ url_for('admin.clear_bookings') }}" onsubmit="return confirm('Delete ALL bookings, payments, documents and status logs? References will restart from SR-{{ year }}-00001.');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-outline" style="color:#b91c1c;border-color:#b91c1c;font-size:0.85rem;">Clear all bookings (reset to 00001)</button>
+  </form>
+</div>
+<div style="margin-bottom:1rem;">
+  <a href="?status=" class="btn btn-navy" style="padding:0.4rem 0.8rem; font-size:0.85rem;">All</a>
+  <a href="?status=Pending" class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.85rem;">Pending</a>
+  <a href="?status=Payment Verification" class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.85rem;">Payment Verification</a>
+  <a href="?status=Confirmed" class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.85rem;">Confirmed</a>
+</div>
+<div class="card" style="padding:1rem; overflow-x:auto;">
+  <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+    <thead>
+      <tr style="text-align:left; border-bottom:1px solid var(--border);">
+        <th style="padding:0.5rem;">Reference</th>
+        <th>Customer</th>
+        <th>What booked</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in bookings %}
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:0.6rem;"><a href="{{ url_for('admin.booking_detail', id=b.id) }}"><strong>{{ b.reference }}</strong></a></td>
+        <td style="padding:0.5rem;">
+          {{ b.customer.full_name if b.customer else '—' }}<br>
+          <span style="font-size:0.8rem;color:var(--text-muted);">{{ b.customer.mobile if b.customer else '' }}</span>
+        </td>
+        <td style="padding:0.5rem;max-width:280px;">{{ b.summary_label('en') }}</td>
+        <td style="padding:0.5rem;">{{ b.booking_type }}</td>
+        <td style="padding:0.5rem;"><span class="badge">{{ b.status }}</span></td>
+        <td style="padding:0.5rem;white-space:nowrap;">{{ b.submitted_at.strftime('%Y-%m-%d %H:%M') if b.submitted_at else '—' }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" style="padding:1rem;">No bookings.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
